@@ -5,7 +5,7 @@ export const Footer = () => (
   <div>
     <footer className={styles.footer}>
       <NavLink to="/" className={styles.logo}>
-        <img src="img/logo/Logo.svg" alt="Nice gadgets logo" />
+        <img src="/img/logo/Logo.svg" alt="Nice gadgets logo" />
       </NavLink>
 
       <ul className={styles['footer-list']}>
@@ -42,7 +42,7 @@ export const Footer = () => (
       <div className={styles['back-to-top']}>
         <p className={styles.text}>Back to top</p>
         <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <img src="img/icons/ChevronArrowUp.svg" alt="Back to top" />
+          <img src="/img/icons/ChevronArrowUp.svg" alt="Back to top" />
         </button>
       </div>
     </footer>

@@ -1,25 +1,54 @@
-import { delay } from '../utils/delay';
+import { http } from './http';
+import { Product } from '../types/Product';
+import { ProductDescription } from '../types/ProductFull';
 
-export async function getProducts() {
-  await delay(1000);
-
-  const response = await fetch('api/products.json');
-
-  if (!response.ok) {
-    throw new Error('Failed to load products');
-  }
-
-  return response.json();
+interface GetProductsParams {
+  category?: string;
+  sort?: string;
+  page?: number;
+  perPage?: string;
+  search?: string;
 }
 
-export async function getProductsDetails(type: string | undefined) {
-  await delay(1000);
+interface GetProductsResponse {
+  items: Product[];
+  total: number;
+}
 
-  const response = await fetch(`api/${type}.json`);
+export async function getProducts(
+  params?: GetProductsParams,
+): Promise<GetProductsResponse> {
+  const searchParams = new URLSearchParams();
 
-  if (!response.ok) {
-    throw new Error('Failed to load product details');
+  if (params?.category) {
+    searchParams.append('category', params.category);
   }
 
-  return response.json();
+  if (params?.sort) {
+    searchParams.append('sort', params.sort);
+  }
+
+  if (params?.page) {
+    searchParams.append('page', params.page.toString());
+  }
+
+  if (params?.perPage) {
+    searchParams.append('perPage', params.perPage);
+  }
+
+  if (params?.search) {
+    searchParams.append('search', params.search);
+  }
+
+  const query = searchParams.toString();
+  const url = query ? `/products?${query}` : '/products';
+
+  return http<GetProductsResponse>(url);
+}
+
+export async function getProductDetails(
+  category: string,
+  itemId: string,
+): Promise<ProductDescription> {
+  return http<ProductDescription>(`/products/${category}/${itemId}`);
 }

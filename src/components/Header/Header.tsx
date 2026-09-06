@@ -32,7 +32,7 @@ export const Header = () => {
           <div className={style['img-box']}>
             <img
               className={style.fav__icon}
-              src="img/icons/Favourites (Heart Like).svg"
+              src="/img/icons/Favourites (Heart Like).svg"
               alt="Favourites"
             />
             {favorites.length > 0 && (
@@ -45,7 +45,7 @@ export const Header = () => {
           <div className={style['img-box']}>
             <img
               className={style.cart__icon}
-              src="img/icons/Shopping bag (Cart).svg"
+              src="/img/icons/Shopping bag (Cart).svg"
               alt="Cart"
             />
             {cart.length > 0 && (
@@ -57,7 +57,7 @@ export const Header = () => {
         <button className={style.burger__wrapper} onClick={handleMenuToggle}>
           <img
             className="{style.burger__icon"
-            src={!isMenuOpen ? 'img/icons/Menu.svg' : 'img/icons/Close.svg'}
+            src={!isMenuOpen ? '/img/icons/Menu.svg' : '/img/icons/Close.svg'}
             alt={!isMenuOpen ? 'Open Menu' : 'Close Menu'}
           />
         </button>

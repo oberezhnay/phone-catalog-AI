@@ -1,33 +1,50 @@
 import { NavLink, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getProducts, getProductsDetails } from '../../api/products';
 import { Loader } from '../../components/Loader';
-import { ProductDescription } from '../../types/ProductFull';
 import { BreadCrumbs } from '../shared/components/BreadCrumbs';
 import { BackBtn } from '../shared/components/BackBtn';
 import styles from './ProductDetails.module.scss';
 import { ProductCategory } from '../../types/ProductCategory';
-import { Product } from '../../types/Product';
 import { ProductsSlider } from '../HomePage/components/ProductsSlider';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useCart } from '../../contexts/CartContext';
+import {
+  useProductDetailsQuery,
+  useProductsQuery,
+} from '../../hooks/queries';
 
 export const ProductDetails = () => {
   const { category, productId } = useParams();
-  const [product, setProduct] = useState<ProductDescription | null>(null);
-  const [baseProduct, setBaseProduct] = useState<Product | null>(null);
-  const [baseProducts, setBaseProducts] = useState<Product[] | []>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [activeImg, setActiveImg] = useState<string | undefined>(undefined);
+
+  // Fetch product details
+  const { data: product, isLoading } = useProductDetailsQuery(
+    category || '',
+    productId || '',
+  );
+
+  // Fetch all products in category for "you may also like"
+  const { data: categoryData } = useProductsQuery({
+    category: category || undefined,
+    perPage: 'all',
+  });
+
+  const baseProducts = categoryData?.items || [];
 
   const { cart, toggleCart } = useCart();
   const { favorites, toggleFavorite } = useFavorites();
-  const isFavorite = baseProduct ? favorites.includes(baseProduct?.id) : false;
-  const isProductInCart = baseProduct
-    ? cart.find(p => p.id === baseProduct?.id) || 0
+
+  // Use productId from API response or fallback to numeric id if available
+  const productNumericId =
+    product?.productId || (product && 'id' in product ? product.id : undefined);
+  const isFavorite = productNumericId
+    ? favorites.includes(productNumericId)
+    : false;
+  const isProductInCart = productNumericId
+    ? cart.find(p => p.id === productNumericId) || 0
     : false;
 
   const images = product?.images;
-  const [activeImg, setActiveImg] = useState<string | undefined>(undefined);
 
   const colorMap: Record<string, string> = {
     gold: '#FCDBC1',
@@ -41,40 +58,15 @@ export const ProductDetails = () => {
   };
 
   useEffect(() => {
-    if (!category || !productId) {
-      return;
-    }
-
-    setIsLoading(true);
-
-    Promise.all([getProducts(), getProductsDetails(category)])
-      .then(([allProducts, products]) => {
-        const foundedBaseProduct = allProducts.find(
-          (prod: Product) => prod.itemId === productId,
-        );
-
-        setBaseProduct(foundedBaseProduct);
-        setBaseProducts(
-          allProducts.filter((prod: Product) => prod.category === category),
-        );
-
-        const foundProduct = products.find(
-          (prod: ProductDescription) => prod.id === productId,
-        );
-
-        setProduct(foundProduct || null);
-      })
-      .finally(() => setIsLoading(false));
-  }, [category, productId]);
-
-  useEffect(() => {
-    if (product) {
+    if (product?.images?.length) {
       setActiveImg(product.images[0]);
     }
-  }, [product]);
+  }, [product?.images]);
 
-  const getSuggestedProducts = (products: Product[]) => {
-    const filtered = products.filter(p => p.id !== baseProduct?.id);
+  const getSuggestedProducts = (
+    products: { id: number; [key: string]: unknown }[],
+  ) => {
+    const filtered = products.filter(p => p.id !== productNumericId);
 
     return filtered.sort(() => Math.random() - 0.5).slice(0, 8);
   };
@@ -113,7 +105,7 @@ export const ProductDetails = () => {
               <div className={styles.colors}>
                 <p className={styles['top-description']}>
                   <p className={styles['option-title']}>Available colors</p>
-                  <p className={styles.id}>ID: {baseProduct?.id}</p>
+                  <p className={styles.id}>ID: {productNumericId}</p>
                 </p>
 
                 <div className={styles.colorDots}>
@@ -156,19 +148,23 @@ export const ProductDetails = () => {
               <div className={styles['buttons-wrapper']}>
                 <button
                   className={`${styles['add-to-cart']} ${isProductInCart ? styles.added : ''}`}
-                  onClick={() => baseProduct && toggleCart(baseProduct.id)}
+                  onClick={() =>
+                    productNumericId && toggleCart(productNumericId)
+                  }
                 >
                   {isProductInCart ? 'Added' : 'Add to cart'}
                 </button>
                 <button
                   className={styles['add-to-favorite']}
-                  onClick={() => baseProduct && toggleFavorite(baseProduct.id)}
+                  onClick={() =>
+                    productNumericId && toggleFavorite(productNumericId)
+                  }
                 >
                   <img
                     src={
                       isFavorite
-                        ? 'img/icons/Favourites Filled (Heart Like).svg'
-                        : 'img/icons/Favourites (Heart Like).svg'
+                        ? '/img/icons/Favourites Filled (Heart Like).svg'
+                        : '/img/icons/Favourites (Heart Like).svg'
                     }
                     alt="Favourites"
                   />

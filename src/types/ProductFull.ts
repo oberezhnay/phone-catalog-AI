@@ -5,6 +5,7 @@ type Description = {
 
 export type ProductDescription = {
   id: string;
+  productId?: number; // Numeric ID for cart/favorites
   category: string;
   namespaceId: string;
   name: string;

@@ -14,9 +14,9 @@ export const HomePage = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    getProducts()
-      .then(p => {
-        setProducts(p);
+    getProducts({ perPage: 'all' })
+      .then(data => {
+        setProducts(data.items);
       })
       .catch(() => {})
       .finally(() => setIsLoading(false));

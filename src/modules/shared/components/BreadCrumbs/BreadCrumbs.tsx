@@ -14,12 +14,12 @@ export const BreadCrumbs: React.FC<Props> = ({ category, itemName }) => {
   return (
     <div className={styles.breadcrumbs}>
       <NavLink to="/" className={styles['breadcrumbs-home']}>
-        <img src="img/icons/Home.svg" alt="Home page" />
+        <img src="/img/icons/Home.svg" alt="Home page" />
       </NavLink>
 
       <img
         className={styles['breadcrumbs-arrow']}
-        src="img/icons/ChevronArrowRight.svg"
+        src="/img/icons/ChevronArrowRight.svg"
         alt="icon"
       />
       <NavLink to={`/${category}`} className={styles['breadcrumbs-category']}>
@@ -29,7 +29,7 @@ export const BreadCrumbs: React.FC<Props> = ({ category, itemName }) => {
         <>
           <img
             className={styles['breadcrumbs-arrow']}
-            src="img/icons/ChevronArrowRight.svg"
+            src="/img/icons/ChevronArrowRight.svg"
             alt="icon"
           />
           <p className={styles['breadcrumbs-category']}>{itemName}</p>

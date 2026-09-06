@@ -9,8 +9,8 @@ export const useProducts = () => {
 
   useEffect(() => {
     getProducts()
-      .then(data => setProducts(data))
-      .catch(() => setError('Faiked to load products'))
+      .then(data => setProducts(data.items))
+      .catch(() => setError('Failed to load products'))
       .finally(() => setIsLoading(false));
   }, []);
 

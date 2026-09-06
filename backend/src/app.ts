@@ -1,0 +1,36 @@
+import express from 'express';
+import cors from 'cors';
+import { config } from './config/env.js';
+import { errorHandler } from './middleware/errorHandler.js';
+import { productsRouter } from './modules/products/products.routes.js';
+
+export function createApp() {
+  const app = express();
+
+  app.use(express.json());
+
+  const corsOrigins = config.CORS_ORIGIN.split(',').map((origin) => origin.trim());
+  app.use(
+    cors({
+      origin: corsOrigins,
+      credentials: true,
+    }),
+  );
+
+  // Health check
+  app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok' });
+  });
+
+  // Routes
+  app.use(productsRouter);
+  // - auth routes (Phase 2)
+  // - cart routes (Phase 3)
+  // - favorites routes (Phase 3)
+  // - orders routes (Phase 4)
+  // - reviews routes (Phase 5)
+
+  app.use(errorHandler);
+
+  return app;
+}

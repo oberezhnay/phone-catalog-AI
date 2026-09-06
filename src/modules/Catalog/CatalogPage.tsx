@@ -1,12 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   CatalogCategory,
   useCatalogCategory,
 } from '../../hooks/useCatalogCategory';
-import { Product } from '../../types/Product';
 import { Loader } from '../../components/Loader';
 import { ProductsList } from './components/ProductsList';
-import { getProducts } from '../../api/products';
+import { useProductsQuery } from '../../hooks/queries/useProductsQuery';
 import styles from './CatalogPage.module.scss';
 import { ProductCategory } from '../../types/ProductCategory';
 import { Pagination } from '../shared/components/Pagination';
@@ -21,14 +20,9 @@ export const CatalogPage = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const sort = searchParams.get('sort') || '';
-  const perPage = searchParams.get('perPage') || 'all';
+  const sort = searchParams.get('sort') || undefined;
+  const perPage = (searchParams.get('perPage') || 'all') as PerPageType;
   const activePage = Number(searchParams.get('page') || 1);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingError, setLoadingError] = useState(false);
-
-  const [products, setProducts] = useState<Product[]>([]);
 
   const prevSort = useRef(sort);
   const prevPerPage = useRef(perPage);
@@ -61,17 +55,17 @@ export const CatalogPage = () => {
     [searchParams, setSearchParams],
   );
 
-  useEffect(() => {
-    setIsLoading(true);
-    getProducts()
-      .then(p => {
-        setProducts(
-          p.filter((product: Product) => product.category === category),
-        );
-      })
-      .catch(() => setLoadingError(true))
-      .finally(() => setIsLoading(false));
-  }, [category]);
+  // Fetch products from server
+  const { data, isLoading } = useProductsQuery({
+    category: category || undefined,
+    sort: sort as 'title' | 'price' | 'age' | undefined,
+    page: activePage,
+    perPage,
+  });
+
+  const products = data?.items || [];
+  const total = data?.total || 0;
+  const loadingError = !!error;
 
   useEffect(() => {
     const sortChanged = prevSort.current !== sort;
@@ -84,38 +78,6 @@ export const CatalogPage = () => {
     prevSort.current = sort;
     prevPerPage.current = perPage;
   }, [sort, perPage, updateParam]);
-
-  const sortedProducts = useMemo(() => {
-    if (!sort) {
-      return products;
-    }
-
-    const sorted = [...products];
-
-    switch (sort) {
-      case 'title':
-        return sorted.sort((a, b) => a.name.localeCompare(b.name));
-
-      case 'price':
-        return sorted.sort((a, b) => a.price - b.price);
-
-      case 'age':
-        return sorted.sort((a, b) => b.year - a.year);
-
-      default:
-        return products;
-    }
-  }, [products, sort]);
-
-  const itemsPerPage =
-    perPage === 'all' ? sortedProducts.length : Number(perPage);
-
-  const from = (activePage - 1) * itemsPerPage;
-  const to = from + itemsPerPage;
-
-  const productsPage = useMemo(() => {
-    return perPage === 'all' ? sortedProducts : sortedProducts.slice(from, to);
-  }, [sortedProducts, from, to, perPage]);
 
   return (
     <div className="container">
@@ -133,13 +95,13 @@ export const CatalogPage = () => {
           <h1 className={styles.title}>
             {titles[category as ProductCategory]}
           </h1>
-          <p className={styles['category-qnt']}>{products.length} models</p>
+          <p className={styles['category-qnt']}>{total} models</p>
 
           <div className={styles.filters}>
             <div className={styles['filter-sort']}>
               <p className={styles.label}>Sort by</p>
               <CustomSelect
-                value={sort}
+                value={sort || ''}
                 onChange={v => updateParam('sort', v)}
                 options={[
                   { value: 'age', label: 'Newest' },
@@ -164,12 +126,12 @@ export const CatalogPage = () => {
             </div>
           </div>
 
-          {products.length > 0 && <ProductsList products={productsPage} />}
+          {products.length > 0 && <ProductsList products={products} />}
 
           {perPage !== 'all' && (
             <Pagination
-              total={sortedProducts.length}
-              perPage={perPage as PerPageType}
+              total={total}
+              perPage={perPage}
               currentPage={activePage}
               onPageChange={page => updateParam('page', page)}
             />

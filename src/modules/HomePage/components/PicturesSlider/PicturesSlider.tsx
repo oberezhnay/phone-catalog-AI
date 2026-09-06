@@ -12,9 +12,9 @@ export const PicturesSlider = () => {
   const paginationRef = useRef<HTMLDivElement | null>(null);
 
   const pictures = [
-    { src: 'img/sliderImages/banner-7.png', alt: 'Banner 1' },
-    { src: 'img/sliderImages/banner-6.png', alt: 'Banner 2' },
-    { src: 'img/sliderImages/banner-8.png', alt: 'Banner 3' },
+    { src: '/img/sliderImages/banner-7.png', alt: 'Banner 1' },
+    { src: '/img/sliderImages/banner-6.png', alt: 'Banner 2' },
+    { src: '/img/sliderImages/banner-8.png', alt: 'Banner 3' },
   ];
 
   return (
@@ -57,14 +57,14 @@ export const PicturesSlider = () => {
         ref={prevRef}
         className={`${style.navButton} ${style.prevButton}`}
       >
-        <img src="img/icons/ChevronArrowLeft.svg" alt="Prev slide"></img>
+        <img src="/img/icons/ChevronArrowLeft.svg" alt="Prev slide"></img>
       </button>
 
       <button
         ref={nextRef}
         className={`${style.navButton} ${style.nextButton}`}
       >
-        <img src="img/icons/ChevronArrowRight.svg" alt="Next slide"></img>
+        <img src="/img/icons/ChevronArrowRight.svg" alt="Next slide"></img>
       </button>
 
       <div ref={paginationRef} className={style.customPagination}></div>

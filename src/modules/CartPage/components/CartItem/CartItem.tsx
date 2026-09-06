@@ -18,7 +18,7 @@ export const CartItem: React.FC<Props> = ({ product, qty }) => {
           className={styles['delete-btn']}
           onClick={() => removeFromCart(product.id)}
         >
-          <img src="img/icons/Close.svg" alt="Delete"></img>
+          <img src="/img/icons/Close.svg" alt="Delete"></img>
         </button>
         <NavLink to={`/${product.category}/${product.itemId}`}>
           <img src={product.image} alt={product.name} />
@@ -33,14 +33,14 @@ export const CartItem: React.FC<Props> = ({ product, qty }) => {
             onClick={() => decrease(product.id)}
             disabled={qty <= 1}
           >
-            <img src="img/icons/Minus.svg" alt="Prev slide"></img>
+            <img src="/img/icons/Minus.svg" alt="Prev slide"></img>
           </button>
           <p className={styles.qty}>{qty}</p>
           <button
             className={`${styles.qtyButton} ${styles.plustButton} ${styles.isActive}`}
             onClick={() => increase(product.id)}
           >
-            <img src="img/icons/Plus.svg" alt="Next slide"></img>
+            <img src="/img/icons/Plus.svg" alt="Next slide"></img>
           </button>
         </div>
         <p className={styles.price}>${product.price}</p>
