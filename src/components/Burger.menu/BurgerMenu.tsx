@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 import { menuLinks } from '../../constants/constants';
 import { Logo } from '../Logo';
+import { useAuth } from '../../contexts/AuthContext';
 
 type Props = {
   isOpen: boolean;
@@ -11,6 +12,13 @@ type Props = {
 };
 
 export const BurgerMenu: React.FC<Props> = ({ isOpen, onClose }) => {
+  const { user, isAuthenticated, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    onClose();
+  };
+
   return (
     <aside
       className={classNames(style.menu, { [style['menu--open']]: isOpen })}
@@ -25,6 +33,34 @@ export const BurgerMenu: React.FC<Props> = ({ isOpen, onClose }) => {
             alt="Close Menu"
           />
         </button>
+      </div>
+
+      <div className={style.menu__account}>
+        {isAuthenticated ? (
+          <>
+            <span className={style.menu__user}>{user?.name}</span>
+            <button
+              className={style.menu__logout}
+              onClick={handleLogout}
+              type="button"
+            >
+              Log out
+            </button>
+          </>
+        ) : (
+          <>
+            <NavLink to="/login" className={style.menu__login} onClick={onClose}>
+              Log in
+            </NavLink>
+            <NavLink
+              to="/register"
+              className={style.menu__register}
+              onClick={onClose}
+            >
+              Register
+            </NavLink>
+          </>
+        )}
       </div>
 
       <ul className={style.menu__list}>

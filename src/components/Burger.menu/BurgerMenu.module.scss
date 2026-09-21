@@ -39,6 +39,37 @@
     height: 16px;
   }
 
+  &__account {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px;
+    border-bottom: 1px solid $elements;
+  }
+
+  &__user {
+    font-size: 14px;
+    font-weight: 600;
+    color: $primary;
+  }
+
+  &__logout,
+  &__login,
+  &__register {
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: $secondary;
+    cursor: pointer;
+  }
+
+  &__login {
+    color: $primary;
+  }
+
   &__list {
     display: flex;
     flex: 1;

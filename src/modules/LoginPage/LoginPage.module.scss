@@ -1,0 +1,77 @@
+@use '@/styles/index' as *;
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0 80px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: $primary;
+  margin-bottom: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 12px;
+  color: $secondary;
+}
+
+.input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid $elements;
+  border-radius: 4px;
+  font-size: 14px;
+  color: $primary;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+  }
+}
+
+.error {
+  color: $red;
+  font-size: 13px;
+}
+
+.submit {
+  height: 40px;
+  border: none;
+  border-radius: 4px;
+  background: $primary;
+  color: $white;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.switch {
+  font-size: 14px;
+  color: $secondary;
+
+  a {
+    color: $primary;
+    font-weight: 600;
+  }
+}

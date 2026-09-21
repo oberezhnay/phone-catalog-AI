@@ -3,6 +3,7 @@ import cors from 'cors';
 import { config } from './config/env.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { productsRouter } from './modules/products/products.routes.js';
+import { authRouter } from './modules/auth/auth.routes.js';
 
 export function createApp() {
   const app = express();
@@ -23,8 +24,8 @@ export function createApp() {
   });
 
   // Routes
+  app.use(authRouter);
   app.use(productsRouter);
-  // - auth routes (Phase 2)
   // - cart routes (Phase 3)
   // - favorites routes (Phase 3)
   // - orders routes (Phase 4)

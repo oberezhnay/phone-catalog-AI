@@ -7,12 +7,14 @@ import { Logo } from '../Logo';
 import classNames from 'classnames';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { getTotalCartItems } from '../../utils/cart';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { favorites } = useFavorites();
   const { cart } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const totalItems = getTotalCartItems(cart);
 
@@ -28,6 +30,16 @@ export const Header = () => {
       <Navbar />
 
       <div className={style.icons}>
+        {isAuthenticated ? (
+          <button className={style.account} onClick={logout} type="button">
+            {user?.name}
+          </button>
+        ) : (
+          <NavLink to="/login" className={style.account}>
+            Log in
+          </NavLink>
+        )}
+
         <NavLink to="/favorites" className={getClass}>
           <div className={style['img-box']}>
             <img

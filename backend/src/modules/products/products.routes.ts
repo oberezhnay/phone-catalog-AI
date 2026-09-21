@@ -7,8 +7,8 @@ import {
   deleteProduct,
 } from './products.controller.js';
 import { validate } from '../../middleware/validate.js';
-import { createProductSchema, updateProductSchema, getProductsQuerySchema } from './products.schema.js';
-import { requireAuth } from '../../middleware/auth.js';
+import { createProductSchema, updateProductSchema } from './products.schema.js';
+import { auth, requireAuth } from '../../middleware/auth.js';
 import { requireAdmin } from '../../middleware/requireRole.js';
 
 export const productsRouter = Router();
@@ -18,6 +18,20 @@ productsRouter.get('/api/products', getProducts);
 productsRouter.get('/api/products/:category/:itemId', getProductDetail);
 
 // Admin routes
-productsRouter.post('/api/products', requireAuth, requireAdmin, validate(createProductSchema), createProduct);
-productsRouter.put('/api/products/:id', requireAuth, requireAdmin, validate(updateProductSchema), updateProduct);
-productsRouter.delete('/api/products/:id', requireAuth, requireAdmin, deleteProduct);
+productsRouter.post(
+  '/api/products',
+  auth,
+  requireAuth,
+  requireAdmin,
+  validate(createProductSchema),
+  createProduct,
+);
+productsRouter.put(
+  '/api/products/:id',
+  auth,
+  requireAuth,
+  requireAdmin,
+  validate(updateProductSchema),
+  updateProduct,
+);
+productsRouter.delete('/api/products/:id', auth, requireAuth, requireAdmin, deleteProduct);

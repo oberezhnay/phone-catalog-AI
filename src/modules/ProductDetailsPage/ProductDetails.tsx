@@ -8,10 +8,7 @@ import { ProductCategory } from '../../types/ProductCategory';
 import { ProductsSlider } from '../HomePage/components/ProductsSlider';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useCart } from '../../contexts/CartContext';
-import {
-  useProductDetailsQuery,
-  useProductsQuery,
-} from '../../hooks/queries';
+import { useProductDetailsQuery, useProductsQuery } from '../../hooks/queries';
 
 export const ProductDetails = () => {
   const { category, productId } = useParams();

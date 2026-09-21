@@ -17,7 +17,23 @@
   .icons {
     margin-left: auto;
     display: flex;
+    align-items: center;
 
+    .account {
+      display: none;
+      border: none;
+      background: none;
+      padding: 0 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: $primary;
+      cursor: pointer;
+      white-space: nowrap;
+
+      @include on-tablet {
+        display: block;
+      }
+    }
 
     .icon__link {
       display: none;
