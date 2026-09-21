@@ -12,14 +12,21 @@ interface AuthResponse {
   token: string;
 }
 
-export async function register(email: string, password: string, name: string): Promise<AuthResponse> {
+export async function register(
+  email: string,
+  password: string,
+  name: string,
+): Promise<AuthResponse> {
   return http<AuthResponse>('/auth/register', {
     method: 'POST',
     body: JSON.stringify({ email, password, name }),
   });
 }
 
-export async function login(email: string, password: string): Promise<AuthResponse> {
+export async function login(
+  email: string,
+  password: string,
+): Promise<AuthResponse> {
   return http<AuthResponse>('/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),

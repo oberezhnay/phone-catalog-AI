@@ -26,7 +26,10 @@ createRoot(document.getElementById('root') as HTMLElement).render(
               <Route path="/" element={<App />}>
                 <Route index element={<HomePage />} />
                 <Route path=":category" element={<CatalogPage />} />
-                <Route path=":category/:productId" element={<ProductDetails />} />
+                <Route
+                  path=":category/:productId"
+                  element={<ProductDetails />}
+                />
                 <Route path="cart" element={<CartPage />} />
                 <Route path="favorites" element={<FavoritesPage />} />
                 <Route path="login" element={<LoginPage />} />

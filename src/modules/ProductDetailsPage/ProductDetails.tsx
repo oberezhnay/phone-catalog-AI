@@ -8,6 +8,7 @@ import { ProductCategory } from '../../types/ProductCategory';
 import { ProductsSlider } from '../HomePage/components/ProductsSlider';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useCart } from '../../contexts/CartContext';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 import { useProductDetailsQuery, useProductsQuery } from '../../hooks/queries';
 
 export const ProductDetails = () => {
@@ -30,6 +31,7 @@ export const ProductDetails = () => {
 
   const { cart, toggleCart } = useCart();
   const { favorites, toggleFavorite } = useFavorites();
+  const requireAuth = useRequireAuth();
 
   // Use productId from API response or fallback to numeric id if available
   const productNumericId =
@@ -146,7 +148,8 @@ export const ProductDetails = () => {
                 <button
                   className={`${styles['add-to-cart']} ${isProductInCart ? styles.added : ''}`}
                   onClick={() =>
-                    productNumericId && toggleCart(productNumericId)
+                    productNumericId &&
+                    requireAuth(() => toggleCart(productNumericId))
                   }
                 >
                   {isProductInCart ? 'Added' : 'Add to cart'}
@@ -154,7 +157,8 @@ export const ProductDetails = () => {
                 <button
                   className={styles['add-to-favorite']}
                   onClick={() =>
-                    productNumericId && toggleFavorite(productNumericId)
+                    productNumericId &&
+                    requireAuth(() => toggleFavorite(productNumericId))
                   }
                 >
                   <img

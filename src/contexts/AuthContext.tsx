@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!token) {
       setIsLoading(false);
+
       return;
     }
 
@@ -45,6 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     const result = await authApi.login(email, password);
+
     localStorage.setItem(TOKEN_KEY, result.token);
     setToken(result.token);
     setUser(result.user);
@@ -54,6 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const register = async (email: string, password: string, name: string) => {
     const result = await authApi.register(email, password, name);
+
     localStorage.setItem(TOKEN_KEY, result.token);
     setToken(result.token);
     setUser(result.user);

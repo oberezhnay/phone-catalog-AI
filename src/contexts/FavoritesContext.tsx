@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getFavorites, setFavorites } from '../api/localFavorites';
+import * as favoritesApi from '../api/favorites';
+import { useAuth } from './AuthContext';
 
 type FavoritesContextType = {
   favorites: number[];
@@ -15,29 +16,31 @@ export const FavoritesProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [favorites, setFavoritesState] = useState<number[]>([]);
+  const { token, isAuthenticated } = useAuth();
+  const [favorites, setFavorites] = useState<number[]>([]);
 
   useEffect(() => {
-    const loadFavorites = async () => {
-      const storedfavorites = await getFavorites();
+    if (!isAuthenticated || !token) {
+      setFavorites([]);
+      return;
+    }
 
-      setFavoritesState(storedfavorites);
-    };
-
-    loadFavorites();
-  }, []);
-
-  const sync = (updated: number[]) => {
-    setFavoritesState(updated);
-    setFavorites(updated);
-  };
+    favoritesApi
+      .getFavorites(token)
+      .then(setFavorites)
+      .catch(() => setFavorites([]));
+  }, [isAuthenticated, token]);
 
   const toggleFavorite = (id: number) => {
-    if (favorites.includes(id)) {
-      sync(favorites.filter(item => item !== id));
-    } else {
-      sync([...favorites, id]);
+    if (!token) {
+      return;
     }
+
+    const request = favorites.includes(id)
+      ? favoritesApi.removeFavorite(token, id)
+      : favoritesApi.addFavorite(token, id);
+
+    request.then(setFavorites);
   };
 
   return (

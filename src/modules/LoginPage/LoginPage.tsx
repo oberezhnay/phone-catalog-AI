@@ -70,12 +70,17 @@ export const LoginPage = () => {
 
           {error && <p className={styles.error}>{error}</p>}
 
-          <button type="submit" className={styles.submit} disabled={isSubmitting}>
+          <button
+            type="submit"
+            className={styles.submit}
+            disabled={isSubmitting}
+          >
             {isSubmitting ? 'Logging in...' : 'Log in'}
           </button>
 
           <p className={styles.switch}>
-            Don&apos;t have an account? <NavLink to="/register">Register</NavLink>
+            Don&apos;t have an account?{' '}
+            <NavLink to="/register">Register</NavLink>
           </p>
         </form>
       </div>

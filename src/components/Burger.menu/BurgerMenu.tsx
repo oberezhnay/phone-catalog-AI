@@ -49,7 +49,11 @@ export const BurgerMenu: React.FC<Props> = ({ isOpen, onClose }) => {
           </>
         ) : (
           <>
-            <NavLink to="/login" className={style.menu__login} onClick={onClose}>
+            <NavLink
+              to="/login"
+              className={style.menu__login}
+              onClick={onClose}
+            >
               Log in
             </NavLink>
             <NavLink

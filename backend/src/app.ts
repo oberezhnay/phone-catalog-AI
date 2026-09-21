@@ -4,6 +4,8 @@ import { config } from './config/env.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { productsRouter } from './modules/products/products.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
+import { cartRouter } from './modules/cart/cart.routes.js';
+import { favoritesRouter } from './modules/favorites/favorites.routes.js';
 
 export function createApp() {
   const app = express();
@@ -26,8 +28,8 @@ export function createApp() {
   // Routes
   app.use(authRouter);
   app.use(productsRouter);
-  // - cart routes (Phase 3)
-  // - favorites routes (Phase 3)
+  app.use(cartRouter);
+  app.use(favoritesRouter);
   // - orders routes (Phase 4)
   // - reviews routes (Phase 5)
 

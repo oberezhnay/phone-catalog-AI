@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getCart, setCart } from '../api/localCart';
+import * as cartApi from '../api/cart';
+import { useAuth } from './AuthContext';
 
 export type CartItem = {
   id: number;
@@ -18,56 +19,81 @@ type CartContextType = {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
-  const [cart, setCartState] = useState<CartItem[]>([]);
+  const { token, isAuthenticated } = useAuth();
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   useEffect(() => {
-    const loadCart = async () => {
-      const storedCart = await getCart();
+    if (!isAuthenticated || !token) {
+      setCart([]);
+      return;
+    }
 
-      setCartState(storedCart);
-    };
-
-    loadCart();
-  }, []);
-
-  const sync = (updated: CartItem[]) => {
-    setCartState(updated);
-    setCart(updated);
-  };
+    cartApi
+      .getCart(token)
+      .then(setCart)
+      .catch(() => setCart([]));
+  }, [isAuthenticated, token]);
 
   const toggleCart = (id: number) => {
-    const exists = cart.find(item => item.id === id);
-
-    if (exists) {
-      sync(cart.filter(item => item.id !== id));
-    } else {
-      sync([...cart, { id, qty: 1 }]);
+    if (!token) {
+      return;
     }
+
+    const exists = cart.find(item => item.id === id);
+    const request = exists
+      ? cartApi.removeCartItem(token, id)
+      : cartApi.addCartItem(token, id);
+
+    request.then(setCart);
   };
 
   const removeFromCart = (id: number) => {
-    sync(cart.filter(item => item.id !== id));
+    if (!token) {
+      return;
+    }
+
+    cartApi.removeCartItem(token, id).then(setCart);
   };
 
   const increase = (id: number) => {
-    sync(
-      cart.map(item =>
-        item.id === id ? { ...item, qty: item.qty + 1 } : item,
-      ),
-    );
+    if (!token) {
+      return;
+    }
+
+    const item = cart.find(p => p.id === id);
+
+    if (!item) {
+      return;
+    }
+
+    cartApi.updateCartItem(token, id, item.qty + 1).then(setCart);
   };
 
   const decrease = (id: number) => {
-    const updated = cart
-      .map(item => (item.id === id ? { ...item, qty: item.qty - 1 } : item))
+    if (!token) {
+      return;
+    }
 
-      .filter(item => item.qty > 0);
+    const item = cart.find(p => p.id === id);
 
-    sync(updated);
+    if (!item) {
+      return;
+    }
+
+    const request =
+      item.qty <= 1
+        ? cartApi.removeCartItem(token, id)
+        : cartApi.updateCartItem(token, id, item.qty - 1);
+
+    request.then(setCart);
   };
 
   const clearCart = () => {
-    sync([]);
+    if (!token) {
+      return;
+    }
+
+    cartApi.clearCart(token).then(setCart);
   };
 
   return (

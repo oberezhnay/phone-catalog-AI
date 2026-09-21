@@ -83,7 +83,11 @@ export const RegisterPage = () => {
 
           {error && <p className={styles.error}>{error}</p>}
 
-          <button type="submit" className={styles.submit} disabled={isSubmitting}>
+          <button
+            type="submit"
+            className={styles.submit}
+            disabled={isSubmitting}
+          >
             {isSubmitting ? 'Creating account...' : 'Register'}
           </button>
 

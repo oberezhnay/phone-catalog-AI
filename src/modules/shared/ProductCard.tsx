@@ -5,6 +5,7 @@ import styles from './ProductCard.module.scss';
 import { NavLink } from 'react-router-dom';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useCart } from '../../contexts/CartContext';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 import { PriceView } from '../HomePage/components/ProductsSlider';
 
 type Props = {
@@ -20,6 +21,7 @@ export const ProductCard: React.FC<Props> = ({
 }) => {
   const { cart, toggleCart } = useCart();
   const { favorites, toggleFavorite } = useFavorites();
+  const requireAuth = useRequireAuth();
   const isFavorite = favorites.includes(product.id);
   const isProductInCart = cart.find(p => p.id === product.id) || 0;
 
@@ -61,13 +63,13 @@ export const ProductCard: React.FC<Props> = ({
       <div className={styles['buttons-wrapper']}>
         <button
           className={`${styles['add-to-cart']} ${isProductInCart ? styles.added : ''}`}
-          onClick={() => toggleCart(product.id)}
+          onClick={() => requireAuth(() => toggleCart(product.id))}
         >
           {isProductInCart ? 'Added' : 'Add to cart'}
         </button>
         <button
           className={styles['add-to-favorite']}
-          onClick={() => toggleFavorite(product.id)}
+          onClick={() => requireAuth(() => toggleFavorite(product.id))}
         >
           <img
             src={
