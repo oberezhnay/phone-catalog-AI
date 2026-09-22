@@ -28,6 +28,12 @@
   font-size: 14px;
 }
 
+.error {
+  margin: -12px 0 24px;
+  font-size: 14px;
+  color: $red;
+}
+
 .buttons {
   display: flex;
   justify-content: flex-end;

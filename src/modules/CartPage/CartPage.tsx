@@ -1,17 +1,24 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Loader } from '../../components/Loader';
 import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useProducts } from '../../hooks/useProducts';
 import { BackBtn } from '../shared/components/BackBtn';
 import styles from './CartPage.module.scss';
 import { CartItem } from './components/CartItem';
 import { Modal } from '../shared/components/Modal';
 import { getTotalCartItems } from '../../utils/cart';
+import { createOrder } from '../../api/orders';
 
 export const CartPage = () => {
   const { cart, clearCart } = useCart();
+  const { token } = useAuth();
   const { products, isLoading, error } = useProducts();
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [orderError, setOrderError] = useState('');
+  const navigate = useNavigate();
 
   if (isLoading) {
     return <Loader />;
@@ -42,9 +49,25 @@ export const CartPage = () => {
 
   const totalItems = getTotalCartItems(cart);
 
-  const confirmHandler = () => {
-    clearCart();
-    setIsOpenModal(false);
+  const confirmHandler = async () => {
+    if (!token) {
+      return;
+    }
+
+    setIsPlacingOrder(true);
+    setOrderError('');
+
+    try {
+      const order = await createOrder(token);
+
+      clearCart();
+      setIsOpenModal(false);
+      navigate('/orders', { state: { placedOrderId: order.id } });
+    } catch {
+      setOrderError('Failed to place order. Please try again.');
+    } finally {
+      setIsPlacingOrder(false);
+    }
   };
 
   const total = getTotalPrice();
@@ -86,6 +109,8 @@ export const CartPage = () => {
             <Modal
               onClose={() => setIsOpenModal(false)}
               onConfirm={() => confirmHandler()}
+              isConfirmDisabled={isPlacingOrder}
+              error={orderError}
             />
           )}
         </div>

@@ -22,6 +22,7 @@ export const FavoritesProvider = ({
   useEffect(() => {
     if (!isAuthenticated || !token) {
       setFavorites([]);
+
       return;
     }
 

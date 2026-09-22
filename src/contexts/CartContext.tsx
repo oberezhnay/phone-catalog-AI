@@ -25,6 +25,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!isAuthenticated || !token) {
       setCart([]);
+
       return;
     }
 

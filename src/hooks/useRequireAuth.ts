@@ -9,6 +9,7 @@ export const useRequireAuth = () => {
   return (action: () => void) => {
     if (!isAuthenticated) {
       navigate('/login', { state: { from: location.pathname } });
+
       return;
     }
 

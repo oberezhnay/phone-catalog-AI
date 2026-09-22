@@ -39,6 +39,13 @@ export const BurgerMenu: React.FC<Props> = ({ isOpen, onClose }) => {
         {isAuthenticated ? (
           <>
             <span className={style.menu__user}>{user?.name}</span>
+            <NavLink
+              to="/orders"
+              className={style.menu__login}
+              onClick={onClose}
+            >
+              My Orders
+            </NavLink>
             <button
               className={style.menu__logout}
               onClick={handleLogout}

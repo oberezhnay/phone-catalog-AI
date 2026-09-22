@@ -31,9 +31,14 @@ export const Header = () => {
 
       <div className={style.icons}>
         {isAuthenticated ? (
-          <button className={style.account} onClick={logout} type="button">
-            {user?.name}
-          </button>
+          <>
+            <NavLink to="/orders" className={style.account}>
+              My Orders
+            </NavLink>
+            <button className={style.account} onClick={logout} type="button">
+              {user?.name}
+            </button>
+          </>
         ) : (
           <NavLink to="/login" className={style.account}>
             Log in

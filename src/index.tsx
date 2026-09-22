@@ -10,11 +10,13 @@ import { CartPage } from './modules/CartPage';
 import { FavoritesPage } from './modules/FavoritesPage';
 import { LoginPage } from './modules/LoginPage';
 import { RegisterPage } from './modules/RegisterPage';
+import { OrdersPage } from './modules/OrdersPage';
 import { NotFoundPage } from './modules/NotFoundPage';
 import './styles/index.scss';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { FavoritesProvider } from './contexts/FavoritesContext';
+import { ProtectedRoute } from './modules/shared/components/ProtectedRoute';
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <QueryClientProvider client={queryClient}>
@@ -34,6 +36,14 @@ createRoot(document.getElementById('root') as HTMLElement).render(
                 <Route path="favorites" element={<FavoritesPage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="register" element={<RegisterPage />} />
+                <Route
+                  path="orders"
+                  element={
+                    <ProtectedRoute>
+                      <OrdersPage />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="*" element={<NotFoundPage />} />
               </Route>
 
