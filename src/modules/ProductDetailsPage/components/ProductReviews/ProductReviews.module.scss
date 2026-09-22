@@ -1,0 +1,140 @@
+@use '@/styles/index' as *;
+
+$star-color: #ffc107;
+
+.reviews {
+  margin-top: 56px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  padding-bottom: 16px;
+  border-bottom: 1px solid $elements;
+}
+
+.average {
+  margin-top: 16px;
+  color: $secondary;
+  font-size: 14px;
+}
+
+.empty {
+  margin-top: 16px;
+  color: $secondary;
+  font-size: 14px;
+}
+
+.list {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.item {
+  border: 1px solid $elements;
+  padding: 16px;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.author {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.stars {
+  color: $star-color;
+  letter-spacing: 2px;
+}
+
+.comment {
+  margin-top: 8px;
+  font-size: 14px;
+  color: $secondary;
+}
+
+.form {
+  margin-top: 32px;
+  max-width: 400px;
+}
+
+.form-title {
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.stars-input {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.star {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: $elements;
+  padding: 0;
+
+  &.filled {
+    color: $star-color;
+  }
+}
+
+.textarea {
+  width: 100%;
+  min-height: 80px;
+  border: 1px solid $elements;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.error {
+  margin-top: 8px;
+  font-size: 14px;
+  color: $red;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.submit {
+  background-color: $primary;
+  color: $white;
+  border: none;
+  padding: 0 16px;
+  height: 40px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @include hover(box-shadow, 0 3px 13px rgba(23, 32, 49, 0.4));
+}
+
+.delete {
+  background: none;
+  border: 1px solid $red;
+  color: $red;
+  padding: 0 16px;
+  height: 40px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+}

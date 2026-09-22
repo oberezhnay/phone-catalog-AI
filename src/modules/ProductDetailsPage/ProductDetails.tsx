@@ -10,6 +10,7 @@ import { useFavorites } from '../../contexts/FavoritesContext';
 import { useCart } from '../../contexts/CartContext';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
 import { useProductDetailsQuery, useProductsQuery } from '../../hooks/queries';
+import { ProductReviews } from './components/ProductReviews';
 
 export const ProductDetails = () => {
   const { category, productId } = useParams();
@@ -242,6 +243,10 @@ export const ProductDetails = () => {
               </ul>
             </div>
           </div>
+
+          {productNumericId && (
+            <ProductReviews productId={Number(productNumericId)} />
+          )}
 
           <div className={styles['may-like']}>
             <ProductsSlider

@@ -7,6 +7,7 @@ import { authRouter } from './modules/auth/auth.routes.js';
 import { cartRouter } from './modules/cart/cart.routes.js';
 import { favoritesRouter } from './modules/favorites/favorites.routes.js';
 import { ordersRouter } from './modules/orders/orders.routes.js';
+import { reviewsRouter } from './modules/reviews/reviews.routes.js';
 
 export function createApp() {
   const app = express();
@@ -35,7 +36,7 @@ export function createApp() {
   app.use(cartRouter);
   app.use(favoritesRouter);
   app.use(ordersRouter);
-  // - reviews routes (Phase 5)
+  app.use(reviewsRouter);
 
   app.use(errorHandler);
 
