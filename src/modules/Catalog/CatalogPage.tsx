@@ -56,7 +56,7 @@ export const CatalogPage = () => {
   );
 
   // Fetch products from server
-  const { data, isLoading } = useProductsQuery({
+  const { data, isLoading, error } = useProductsQuery({
     category: category || undefined,
     sort: sort as 'title' | 'price' | 'age' | undefined,
     page: activePage,
