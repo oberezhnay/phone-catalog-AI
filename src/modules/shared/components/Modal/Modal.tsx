@@ -5,6 +5,10 @@ type Props = {
   onConfirm: () => void;
   isConfirmDisabled?: boolean;
   error?: string;
+  title?: string;
+  text?: string;
+  confirmLabel?: string;
+  pendingLabel?: string;
 };
 
 export const Modal: React.FC<Props> = ({
@@ -12,6 +16,10 @@ export const Modal: React.FC<Props> = ({
   onConfirm,
   isConfirmDisabled,
   error,
+  title = 'Place order?',
+  text = 'This will create your order and clear the cart.',
+  confirmLabel = 'Confirm',
+  pendingLabel = 'Placing...',
 }) => {
   const handleOutClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
@@ -22,10 +30,8 @@ export const Modal: React.FC<Props> = ({
   return (
     <div className={styles.backdrop} onClick={handleOutClick}>
       <div className={styles.modal}>
-        <h3 className={styles.title}>Place order?</h3>
-        <p className={styles.text}>
-          This will create your order and clear the cart.
-        </p>
+        <h3 className={styles.title}>{title}</h3>
+        <p className={styles.text}>{text}</p>
         {error && <p className={styles.error}>{error}</p>}
         <div className={styles.buttons}>
           <button className={styles.cancel} onClick={onClose}>
@@ -36,7 +42,7 @@ export const Modal: React.FC<Props> = ({
             onClick={onConfirm}
             disabled={isConfirmDisabled}
           >
-            {isConfirmDisabled ? 'Placing...' : 'Confirm'}
+            {isConfirmDisabled ? pendingLabel : confirmLabel}
           </button>
         </div>
       </div>

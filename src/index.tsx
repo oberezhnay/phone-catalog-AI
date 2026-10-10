@@ -11,6 +11,8 @@ import { FavoritesPage } from './modules/FavoritesPage';
 import { LoginPage } from './modules/LoginPage';
 import { RegisterPage } from './modules/RegisterPage';
 import { OrdersPage } from './modules/OrdersPage';
+import { AdminPage } from './modules/AdminPage';
+import { AdminProductFormPage } from './modules/AdminPage/AdminProductFormPage';
 import { NotFoundPage } from './modules/NotFoundPage';
 import './styles/index.scss';
 import { AuthProvider } from './contexts/AuthContext';
@@ -41,6 +43,30 @@ createRoot(document.getElementById('root') as HTMLElement).render(
                   element={
                     <ProtectedRoute>
                       <OrdersPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="admin"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <AdminPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="admin/products/new"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <AdminProductFormPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="admin/products/:id/edit"
+                  element={
+                    <ProtectedRoute requireAdmin>
+                      <AdminProductFormPage />
                     </ProtectedRoute>
                   }
                 />

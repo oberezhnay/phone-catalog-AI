@@ -1,0 +1,79 @@
+@use '@/styles/index' as *;
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.add-button {
+  background-color: $primary;
+  color: $white;
+  border: none;
+  padding: 0 16px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+
+  @include hover(box-shadow, 0 3px 13px rgba(23, 32, 49, 0.4));
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+
+  th,
+  td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid $elements;
+    font-size: 14px;
+  }
+
+  th {
+    color: $secondary;
+    font-weight: 600;
+  }
+}
+
+.thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+
+  a {
+    color: $primary;
+    font-weight: 600;
+  }
+}
+
+.delete {
+  border: none;
+  background: none;
+  color: $red;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}

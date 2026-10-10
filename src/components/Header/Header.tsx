@@ -14,7 +14,7 @@ export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { favorites } = useFavorites();
   const { cart } = useCart();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
 
   const totalItems = getTotalCartItems(cart);
 
@@ -32,6 +32,11 @@ export const Header = () => {
       <div className={style.icons}>
         {isAuthenticated ? (
           <>
+            {isAdmin && (
+              <NavLink to="/admin" className={style.account}>
+                Admin
+              </NavLink>
+            )}
             <NavLink to="/orders" className={style.account}>
               My Orders
             </NavLink>
