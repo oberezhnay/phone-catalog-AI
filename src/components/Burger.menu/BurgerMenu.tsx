@@ -88,7 +88,11 @@ export const BurgerMenu: React.FC<Props> = ({ isOpen, onClose }) => {
           <li key={menuLink.name} className={style.menu__item}>
             <NavLink
               to={menuLink.path}
-              className={style.menu__link}
+              className={({ isActive }) =>
+                classNames(style.menu__link, {
+                  [style['is-active']]: isActive,
+                })
+              }
               onClick={onClose}
             >
               {menuLink.name}

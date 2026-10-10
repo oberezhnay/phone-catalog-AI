@@ -31,58 +31,70 @@ export const Header = () => {
 
       <div className={style.icons}>
         {isAuthenticated ? (
-          <>
-            {isAdmin && (
-              <NavLink to="/admin" className={style.account}>
-                Admin
-              </NavLink>
-            )}
-            <NavLink to="/orders" className={style.account}>
-              My Orders
-            </NavLink>
-            <button className={style.account} onClick={logout} type="button">
+          <div className={style['account-menu']}>
+            <button className={style.account} type="button">
               {user?.name}
             </button>
-          </>
+
+            <div className={style['account-dropdown']}>
+              {isAdmin && (
+                <NavLink to="/admin" className={style['account-dropdown-link']}>
+                  Admin
+                </NavLink>
+              )}
+              <NavLink to="/orders" className={style['account-dropdown-link']}>
+                My Orders
+              </NavLink>
+              <button
+                className={style['account-dropdown-button']}
+                onClick={logout}
+                type="button"
+              >
+                Log out
+              </button>
+            </div>
+          </div>
         ) : (
           <NavLink to="/login" className={style.account}>
             Log in
           </NavLink>
         )}
 
-        <NavLink to="/favorites" className={getClass}>
-          <div className={style['img-box']}>
-            <img
-              className={style.fav__icon}
-              src="/img/icons/Favourites (Heart Like).svg"
-              alt="Favourites"
-            />
-            {favorites.length > 0 && (
-              <p className={style['icon-counter']}>{favorites.length}</p>
-            )}
-          </div>
-        </NavLink>
+        <div className={style['icons-scroll']}>
+          <NavLink to="/favorites" className={getClass}>
+            <div className={style['img-box']}>
+              <img
+                className={style.fav__icon}
+                src="/img/icons/Favourites (Heart Like).svg"
+                alt="Favourites"
+              />
+              {favorites.length > 0 && (
+                <p className={style['icon-counter']}>{favorites.length}</p>
+              )}
+            </div>
+          </NavLink>
 
-        <NavLink to="/cart" className={getClass}>
-          <div className={style['img-box']}>
-            <img
-              className={style.cart__icon}
-              src="/img/icons/Shopping bag (Cart).svg"
-              alt="Cart"
-            />
-            {cart.length > 0 && (
-              <p className={style['icon-counter']}>{totalItems}</p>
-            )}
-          </div>
-        </NavLink>
+          <NavLink to="/cart" className={getClass}>
+            <div className={style['img-box']}>
+              <img
+                className={style.cart__icon}
+                src="/img/icons/Shopping bag (Cart).svg"
+                alt="Cart"
+              />
+              {cart.length > 0 && (
+                <p className={style['icon-counter']}>{totalItems}</p>
+              )}
+            </div>
+          </NavLink>
 
-        <button className={style.burger__wrapper} onClick={handleMenuToggle}>
-          <img
-            className="{style.burger__icon"
-            src={!isMenuOpen ? '/img/icons/Menu.svg' : '/img/icons/Close.svg'}
-            alt={!isMenuOpen ? 'Open Menu' : 'Close Menu'}
-          />
-        </button>
+          <button className={style.burger__wrapper} onClick={handleMenuToggle}>
+            <img
+              className={style.burger__icon}
+              src={!isMenuOpen ? '/img/icons/Menu.svg' : '/img/icons/Close.svg'}
+              alt={!isMenuOpen ? 'Open Menu' : 'Close Menu'}
+            />
+          </button>
+        </div>
       </div>
 
       {isMenuOpen && (
