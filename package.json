@@ -38,7 +38,8 @@
     "sass": "^1.77.8",
     "stylelint": "^16.7.0",
     "typescript": "^5.2.2",
-    "vite": "^5.3.1"
+    "vite": "^5.3.1",
+    "vitest": "^3.2.7"
   },
   "scripts": {
     "start": "vite",
@@ -46,7 +47,9 @@
     "style-format": "npx stylelint 'src/**/*.scss' --fix --allow-empty-input",
     "format": "prettier --write './src/**/*.{ts,tsx}'",
     "lint": "npm run style-format && npm run format",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "browserslist": {
     "production": [
