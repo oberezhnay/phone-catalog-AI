@@ -9,7 +9,9 @@
     "start": "prisma migrate deploy && node dist/index.js",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
-    "db:reset": "prisma migrate reset --force"
+    "db:reset": "prisma migrate reset --force",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@prisma/client": "^5.4.1",
@@ -26,7 +28,10 @@
     "@types/node": "^20.4.5",
     "prisma": "^5.4.1",
     "tsx": "^3.14.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vite": "^7.3.7",
+    "vitest": "^5.0.3",
+    "vitest-mock-extended": "^5.1.1"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
