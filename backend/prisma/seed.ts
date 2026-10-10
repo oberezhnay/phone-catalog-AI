@@ -67,7 +67,7 @@ async function seed() {
     console.log('Cleared existing data');
 
     // Read product list from products.json
-    const productsPath = path.join(__dirname, '../..', 'public/api/products.json');
+    const productsPath = path.join(__dirname, 'seed-data/products.json');
     const productsJson = fs.readFileSync(productsPath, 'utf-8');
     const productsList: ProductListItem[] = JSON.parse(productsJson);
 
@@ -77,7 +77,7 @@ async function seed() {
     const detailMap = new Map<string, ProductDetail>();
 
     for (const category of ['phones', 'tablets', 'accessories']) {
-      const detailPath = path.join(__dirname, '../..', `public/api/${category}.json`);
+      const detailPath = path.join(__dirname, `seed-data/${category}.json`);
       if (fs.existsSync(detailPath)) {
         const detailJson = fs.readFileSync(detailPath, 'utf-8');
         const details: ProductDetail[] = JSON.parse(detailJson);
