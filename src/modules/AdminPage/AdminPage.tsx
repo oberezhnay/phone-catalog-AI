@@ -47,6 +47,19 @@ export const AdminPage = () => {
     return <p>Failed to load products.</p>;
   }
 
+  const renderActions = (product: AdminProduct) => (
+    <div className={styles.actions}>
+      <NavLink to={`/admin/products/${product.id}/edit`}>Edit</NavLink>
+      <button
+        type="button"
+        className={styles.delete}
+        onClick={() => setProductToDelete(product)}
+      >
+        Delete
+      </button>
+    </div>
+  );
+
   return (
     <div className="container">
       <div className={styles.header}>
@@ -56,6 +69,37 @@ export const AdminPage = () => {
         </NavLink>
       </div>
 
+      {/* Mobile: card list (below tablet breakpoint) */}
+      <ul className={styles['card-list']}>
+        {products?.map(product => (
+          <li key={product.id} className={styles.card}>
+            <div className={styles['card-top']}>
+              <img
+                src={product.image}
+                alt={product.name}
+                className={styles.thumb}
+              />
+              <div>
+                <p className={styles['card-name']}>{product.name}</p>
+                <p className={styles['card-category']}>{product.category}</p>
+              </div>
+            </div>
+
+            <div className={styles['card-row']}>
+              <span>Price</span>
+              <span>${product.priceDiscount}</span>
+            </div>
+            <div className={styles['card-row']}>
+              <span>Stock</span>
+              <span>{product.stock}</span>
+            </div>
+
+            {renderActions(product)}
+          </li>
+        ))}
+      </ul>
+
+      {/* Tablet and up: full table */}
       <div className={styles['table-wrapper']}>
         <table className={styles.table}>
           <thead>
@@ -82,18 +126,7 @@ export const AdminPage = () => {
                 <td>{product.category}</td>
                 <td>${product.priceDiscount}</td>
                 <td>{product.stock}</td>
-                <td className={styles.actions}>
-                  <NavLink to={`/admin/products/${product.id}/edit`}>
-                    Edit
-                  </NavLink>
-                  <button
-                    type="button"
-                    className={styles.delete}
-                    onClick={() => setProductToDelete(product)}
-                  >
-                    Delete
-                  </button>
-                </td>
+                <td>{renderActions(product)}</td>
               </tr>
             ))}
           </tbody>

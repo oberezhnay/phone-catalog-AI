@@ -12,7 +12,7 @@ type Props = {
 };
 
 export const BurgerMenu: React.FC<Props> = ({ isOpen, onClose }) => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -39,6 +39,15 @@ export const BurgerMenu: React.FC<Props> = ({ isOpen, onClose }) => {
         {isAuthenticated ? (
           <>
             <span className={style.menu__user}>{user?.name}</span>
+            {isAdmin && (
+              <NavLink
+                to="/admin"
+                className={style.menu__login}
+                onClick={onClose}
+              >
+                Admin
+              </NavLink>
+            )}
             <NavLink
               to="/orders"
               className={style.menu__login}
