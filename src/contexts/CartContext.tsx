@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as cartApi from '../api/cart';
 import { useAuth } from './AuthContext';
+import { createRequiredContext } from '../utils/createRequiredContext';
 
 export type CartItem = {
   id: number;
@@ -16,7 +17,9 @@ type CartContextType = {
   clearCart: () => void;
 };
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+const [CartContext, useCart] = createRequiredContext<CartContextType>('CartProvider');
+
+export { useCart };
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const { token, isAuthenticated } = useAuth();
@@ -113,12 +116,3 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useCart = () => {
-  const context = useContext(CartContext);
-
-  if (!context) {
-    throw new Error('Cart Context Error');
-  }
-
-  return context;
-};

@@ -2,7 +2,7 @@ import { http } from './http';
 import { Product } from '../types/Product';
 import { ProductDescription } from '../types/ProductFull';
 
-interface GetProductsParams {
+export interface GetProductsParams {
   category?: string;
   sort?: string;
   page?: number;
@@ -10,8 +10,8 @@ interface GetProductsParams {
   search?: string;
 }
 
-interface GetProductsResponse {
-  items: Product[];
+export interface GetProductsResponse<T = Product> {
+  items: T[];
   total: number;
 }
 

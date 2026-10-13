@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import React, { useEffect, useState } from 'react';
 import * as authApi from '../api/auth';
 import { User } from '../api/auth';
+import { createRequiredContext } from '../utils/createRequiredContext';
 
 const TOKEN_KEY = 'authToken';
 
@@ -16,7 +16,9 @@ type AuthContextType = {
   logout: () => void;
 };
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const [AuthContext, useAuth] = createRequiredContext<AuthContextType>('AuthProvider');
+
+export { useAuth };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -24,7 +26,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.getItem(TOKEN_KEY),
   );
   const [isLoading, setIsLoading] = useState(true);
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!token) {
@@ -44,32 +45,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .finally(() => setIsLoading(false));
   }, [token]);
 
-  const login = async (email: string, password: string) => {
-    const result = await authApi.login(email, password);
-
+  const startSession = (result: { token: string; user: User }) => {
     localStorage.setItem(TOKEN_KEY, result.token);
     setToken(result.token);
     setUser(result.user);
-    queryClient.invalidateQueries({ queryKey: ['cart'] });
-    queryClient.invalidateQueries({ queryKey: ['favorites'] });
+  };
+
+  const login = async (email: string, password: string) => {
+    startSession(await authApi.login(email, password));
   };
 
   const register = async (email: string, password: string, name: string) => {
-    const result = await authApi.register(email, password, name);
-
-    localStorage.setItem(TOKEN_KEY, result.token);
-    setToken(result.token);
-    setUser(result.user);
-    queryClient.invalidateQueries({ queryKey: ['cart'] });
-    queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    startSession(await authApi.register(email, password, name));
   };
 
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY);
     setToken(null);
     setUser(null);
-    queryClient.invalidateQueries({ queryKey: ['cart'] });
-    queryClient.invalidateQueries({ queryKey: ['favorites'] });
   };
 
   return (
@@ -90,12 +83,3 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error('Auth Context Error');
-  }
-
-  return context;
-};

@@ -1,10 +1,9 @@
 import { http } from './http';
+import { GetProductsResponse } from './products';
 import { AdminProduct, AdminProductInput } from '../types/AdminProduct';
 
 export async function getAdminProducts(): Promise<AdminProduct[]> {
-  const data = await http<{ items: AdminProduct[]; total: number }>(
-    '/products?perPage=all',
-  );
+  const data = await http<GetProductsResponse<AdminProduct>>('/products?perPage=all');
 
   return data.items;
 }
