@@ -1,27 +1,7 @@
-type Description = {
-  title: string;
-  text: string[];
-};
+import { ProductRecord } from './ProductRecord';
 
-export type ProductDescription = {
-  id: string;
-  productId?: number; // Numeric ID for cart/favorites
-  category: string;
-  namespaceId: string;
-  name: string;
-  capacityAvailable: string[];
-  capacity: string;
-  priceRegular: number;
-  priceDiscount: number;
-  colorsAvailable: string[];
-  color: string;
-  images: string[];
-  description: Description[];
-  screen: string;
-  resolution: string;
-  processor: string;
-  ram: string;
-  camera: string;
-  zoom: string;
-  cell: string[];
+// Product details response: the full product plus the numeric id that the
+// cart and favourites use.
+export type ProductDescription = ProductRecord & {
+  productId: number;
 };

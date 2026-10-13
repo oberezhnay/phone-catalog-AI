@@ -4,13 +4,13 @@ import { Loader } from '../../components/Loader';
 import { BreadCrumbs } from '../shared/components/BreadCrumbs';
 import { BackBtn } from '../shared/components/BackBtn';
 import styles from './ProductDetails.module.scss';
-import { ProductCategory } from '../../types/ProductCategory';
 import { ProductsSlider } from '../HomePage/components/ProductsSlider';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useCart } from '../../contexts/CartContext';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
 import { useProductDetailsQuery, useProductsQuery } from '../../hooks/queries';
 import { ProductReviews } from './components/ProductReviews';
+import { Product } from '../../types/Product';
 
 export const ProductDetails = () => {
   const { category, productId } = useParams();
@@ -35,8 +35,7 @@ export const ProductDetails = () => {
   const requireAuth = useRequireAuth();
 
   // Use productId from API response or fallback to numeric id if available
-  const productNumericId =
-    product?.productId || (product && 'id' in product ? product.id : undefined);
+  const productNumericId = product?.productId;
   const isFavorite = productNumericId
     ? favorites.includes(productNumericId)
     : false;
@@ -63,9 +62,7 @@ export const ProductDetails = () => {
     }
   }, [product?.images]);
 
-  const getSuggestedProducts = (
-    products: { id: number; [key: string]: unknown }[],
-  ) => {
+  const getSuggestedProducts = (products: Product[]) => {
     const filtered = products.filter(p => p.id !== productNumericId);
 
     return filtered.sort(() => Math.random() - 0.5).slice(0, 8);
@@ -78,10 +75,7 @@ export const ProductDetails = () => {
 
       {product && (
         <div className={styles['product-details']}>
-          <BreadCrumbs
-            category={category as ProductCategory}
-            itemName={product.name}
-          />
+          <BreadCrumbs category={product.category} itemName={product.name} />
           <BackBtn />
 
           <h1 className={styles.title}>{product.name}</h1>

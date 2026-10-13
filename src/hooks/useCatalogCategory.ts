@@ -1,14 +1,9 @@
 import { useParams } from 'react-router-dom';
-import { ProductCategory } from '../types/ProductCategory';
+import { isProductCategory, ProductCategory } from '../types/ProductCategory';
 
-export const validCategories = ['phones', 'tablets', 'accessories'];
+// The category from the URL, or null when the URL names an unknown category.
+export const useCatalogCategory = (): ProductCategory | null => {
+  const { category } = useParams();
 
-export type CatalogCategory = (typeof validCategories)[number];
-
-export const useCatalogCategory = () => {
-  const { category } = useParams<{ category: ProductCategory }>();
-
-  const isValid = validCategories.includes(category as CatalogCategory);
-
-  return isValid ? (category as ProductCategory) : null;
+  return isProductCategory(category) ? category : null;
 };

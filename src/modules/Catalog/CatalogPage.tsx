@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import {
-  CatalogCategory,
-  useCatalogCategory,
-} from '../../hooks/useCatalogCategory';
+import { useCatalogCategory } from '../../hooks/useCatalogCategory';
 import { Loader } from '../../components/Loader';
 import { ProductsList } from './components/ProductsList';
 import { useProductsQuery } from '../../hooks/queries/useProductsQuery';
@@ -12,17 +9,25 @@ import { Pagination } from '../shared/components/Pagination';
 import { BreadCrumbs } from '../shared/components/BreadCrumbs';
 import { useSearchParams } from 'react-router-dom';
 import { CustomSelect } from './components/Select';
+import { parseOption } from '../../utils/parseOption';
+import { NotFoundPage } from '../NotFoundPage';
 
-export type PerPageType = '4' | '8' | '16' | 'all';
+const SORT_OPTIONS = ['title', 'price', 'age'] as const;
+const PER_PAGE_OPTIONS = ['4', '8', '16', 'all'] as const;
+
+export type PerPageType = (typeof PER_PAGE_OPTIONS)[number];
 
 export const CatalogPage = () => {
-  const category: CatalogCategory | null = useCatalogCategory();
+  const category = useCatalogCategory();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const sort = searchParams.get('sort') || undefined;
-  const perPage = (searchParams.get('perPage') || 'all') as PerPageType;
-  const activePage = Number(searchParams.get('page') || 1);
+  const sort = parseOption(SORT_OPTIONS, searchParams.get('sort'));
+  const perPage =
+    parseOption(PER_PAGE_OPTIONS, searchParams.get('perPage')) ?? 'all';
+  const requestedPage = Number(searchParams.get('page'));
+  const activePage =
+    Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
 
   const prevSort = useRef(sort);
   const prevPerPage = useRef(perPage);
@@ -58,7 +63,7 @@ export const CatalogPage = () => {
   // Fetch products from server
   const { data, isLoading, error } = useProductsQuery({
     category: category || undefined,
-    sort: sort as 'title' | 'price' | 'age' | undefined,
+    sort,
     page: activePage,
     perPage,
   });
@@ -79,6 +84,10 @@ export const CatalogPage = () => {
     prevPerPage.current = perPage;
   }, [sort, perPage, updateParam]);
 
+  if (!category) {
+    return <NotFoundPage />;
+  }
+
   return (
     <div className="container">
       {loadingError && !isLoading && <h1>Something went wrong</h1>}
@@ -91,10 +100,8 @@ export const CatalogPage = () => {
 
       {!isLoading && !loadingError && (
         <div className={styles.catalog}>
-          <BreadCrumbs category={category as ProductCategory} />
-          <h1 className={styles.title}>
-            {titles[category as ProductCategory]}
-          </h1>
+          <BreadCrumbs category={category} />
+          <h1 className={styles.title}>{titles[category]}</h1>
           <p className={styles['category-qnt']}>{total} models</p>
 
           <div className={styles.filters}>
