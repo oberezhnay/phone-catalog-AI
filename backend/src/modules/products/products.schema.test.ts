@@ -8,12 +8,24 @@ describe('getProductsQuerySchema', () => {
   it('keeps valid values', () => {
     expect(
       getProductsQuerySchema.parse({ category: 'phones', sort: 'price', page: '2', perPage: '8' }),
-    ).toEqual({ category: 'phones', sort: 'price', page: 2, perPage: '8' });
+    ).toEqual({ category: 'phones', sort: 'price', page: 2, perPage: 8 });
+  });
+
+  it('accepts any whole number of items per page from 1 to 100', () => {
+    expect(getProductsQuerySchema.parse({ perPage: '5' }).perPage).toBe(5);
+    expect(getProductsQuerySchema.parse({ perPage: '100' }).perPage).toBe(100);
+    expect(getProductsQuerySchema.parse({ perPage: 1 }).perPage).toBe(1);
+  });
+
+  it('falls back to "all" for perPage outside 1–100 or not a number', () => {
+    for (const perPage of ['0', '101', '-3', '2.5', 'abc', '']) {
+      expect(getProductsQuerySchema.parse({ perPage }).perPage).toBe('all');
+    }
   });
 
   it('falls back to defaults for bad values instead of rejecting the request', () => {
     expect(
-      getProductsQuerySchema.parse({ category: 'cars', sort: 'bogus', page: '0', perPage: '5' }),
+      getProductsQuerySchema.parse({ category: 'cars', sort: 'bogus', page: '0', perPage: 'x' }),
     ).toEqual({ category: undefined, sort: undefined, page: 1, perPage: 'all' });
   });
 
