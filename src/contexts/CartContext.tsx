@@ -17,7 +17,8 @@ type CartContextType = {
   clearCart: () => void;
 };
 
-const [CartContext, useCart] = createRequiredContext<CartContextType>('CartProvider');
+const [CartContext, useCart] =
+  createRequiredContext<CartContextType>('CartProvider');
 
 export { useCart };
 
@@ -115,4 +116,3 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     </CartContext.Provider>
   );
 };
-

@@ -16,7 +16,8 @@ type AuthContextType = {
   logout: () => void;
 };
 
-const [AuthContext, useAuth] = createRequiredContext<AuthContextType>('AuthProvider');
+const [AuthContext, useAuth] =
+  createRequiredContext<AuthContextType>('AuthProvider');
 
 export { useAuth };
 
@@ -82,4 +83,3 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     </AuthContext.Provider>
   );
 };
-
