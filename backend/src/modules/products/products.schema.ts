@@ -40,7 +40,10 @@ export const getProductsQuerySchema = z.object({
   category: z.enum(categories).optional().catch(undefined),
   sort: z.enum(['title', 'price', 'age']).optional().catch(undefined),
   page: z.coerce.number().int().positive().catch(1),
-  perPage: z.enum(['4', '8', '16', 'all']).catch('all'),
+  // Any whole number from 1 to 100 (as before), or 'all'. Caps the page size.
+  perPage: z
+    .union([z.literal('all'), z.coerce.number().int().min(1).max(100)])
+    .catch('all'),
   search: z.string().optional(),
 });
 

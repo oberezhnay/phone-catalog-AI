@@ -104,7 +104,7 @@ describe('products.service', () => {
       prismaMock.product.count.mockResolvedValue(50);
       prismaMock.product.findMany.mockResolvedValue([]);
 
-      await getProductsService({ page: 3, perPage: '8' });
+      await getProductsService({ page: 3, perPage: 8 });
 
       expect(prismaMock.product.findMany).toHaveBeenCalledWith(
         expect.objectContaining({ skip: 16, take: 8 }), // (3-1) * 8
