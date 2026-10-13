@@ -1,4 +1,4 @@
-@use '@/styles/index' as *;
+@use '@/styles/tokens' as *;
 
 .product-card {
   display: flex;
@@ -13,7 +13,7 @@
     width: 237px;
   }
 
-  @include on-desctop{
+  @include on-desktop{
     width: 100%;
   }
 
@@ -33,7 +33,7 @@
       height: 202px;
     }
 
-    @include on-desctop {
+    @include on-desktop {
       height: 196px;
     }
   }

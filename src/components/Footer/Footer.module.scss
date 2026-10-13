@@ -1,4 +1,4 @@
-@use '@/styles/index' as *;
+@use '@/styles/tokens' as *;
 
 .footer {
   display: flex;
@@ -19,7 +19,7 @@
     padding: 32px;
   }
 
-  @include on-desctop {
+  @include on-desktop {
     max-width: 100%;
   }
 

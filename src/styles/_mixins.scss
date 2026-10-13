@@ -1,11 +1,13 @@
+@use 'breakpoints' as *;
+
 @mixin on-tablet {
   @media (min-width: $tablet-min-width) {
     @content;
   }
 }
 
-@mixin on-desctop {
-  @media (min-width: $desctop-min-width) {
+@mixin on-desktop {
+  @media (min-width: $desktop-min-width) {
     @content;
   }
 }
@@ -17,23 +19,13 @@
     padding-inline: 24px;
   }
 
-  @include on-desctop {
+  @include on-desktop {
     width: 1136px;
     margin: 0 auto;
 
     display: flex;
     flex-direction: column
   }
-}
-
-.container {
-  // .container is a flex item of .App (column flex); without this, flex
-  // items default to min-width: auto and refuse to shrink below their
-  // content's intrinsic width, which forces the whole page wider than the
-  // viewport whenever a descendant sets its own min-width (e.g. a table).
-  min-width: 0;
-
-  @include content-padding-in-line;
 }
 
 @mixin page-grid {
@@ -49,7 +41,7 @@
     column-gap: 24px;
   }
 
-  @include on-desctop {
+  @include on-desktop {
     --columns: 24;
 
     column-gap: 16px;

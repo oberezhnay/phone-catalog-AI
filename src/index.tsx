@@ -14,7 +14,7 @@ import { OrdersPage } from './modules/OrdersPage';
 import { AdminPage } from './modules/AdminPage';
 import { AdminProductFormPage } from './modules/AdminPage/AdminProductFormPage';
 import { NotFoundPage } from './modules/NotFoundPage';
-import './styles/index.scss';
+import './styles/global.scss';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { FavoritesProvider } from './contexts/FavoritesContext';

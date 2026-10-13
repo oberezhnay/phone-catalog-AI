@@ -1,4 +1,4 @@
-@use '@/styles/index' as *;
+@use '@/styles/tokens' as *;
 
 .product-details {
   .title {
@@ -40,7 +40,7 @@
       }
 
 
-      @include on-desctop {
+      @include on-desktop {
         width: 80px;
         img {
           width: 80px;
@@ -83,7 +83,7 @@
       }
     }
 
-    @include on-desctop {
+    @include on-desktop {
       .images-block {
         grid-column: span 2;
       }
@@ -113,7 +113,7 @@
       color: $secondary;
     }
 
-    @include on-desctop {
+    @include on-desktop {
       @include page-grid;
 
       .about {

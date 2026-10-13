@@ -1,4 +1,4 @@
-@use '@/styles/index' as *;
+@use '@/styles/tokens' as *;
 
 .catalog {
   .title {
@@ -44,7 +44,7 @@
         flex: none
       }
 
-      @include on-desctop {
+      @include on-desktop {
         width: 176px;
       }
     }
@@ -57,7 +57,7 @@
         flex: none
       }
 
-      @include on-desctop {
+      @include on-desktop {
           width: 128px;
       }
     }

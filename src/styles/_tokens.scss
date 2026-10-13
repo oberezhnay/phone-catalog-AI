@@ -1,0 +1,5 @@
+// Import this in modules (`@use '@/styles/tokens' as *;`).
+// Only variables, breakpoints and mixins: emits no CSS on its own.
+@forward 'breakpoints';
+@forward 'variables';
+@forward 'mixins';
