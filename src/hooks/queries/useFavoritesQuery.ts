@@ -19,8 +19,13 @@ export function useFavoritesMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ token, change }: { token: string; change: FavoritesChange }) =>
-      change(token),
+    mutationFn: ({
+      token,
+      change,
+    }: {
+      token: string;
+      change: FavoritesChange;
+    }) => change(token),
     onSuccess: (ids, { token }) => {
       queryClient.setQueryData(favoritesQueryKey(token), ids);
     },
