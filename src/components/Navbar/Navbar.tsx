@@ -21,6 +21,5 @@ export const Navbar = () => (
         Accessories
       </NavLink>
     </nav>
-
   </div>
 );
