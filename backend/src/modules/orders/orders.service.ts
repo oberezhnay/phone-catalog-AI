@@ -6,6 +6,8 @@ type OrderWithItems = Order & {
   items: (OrderItem & { product: Product })[];
 };
 
+const orderInclude = { items: { include: { product: true } } } as const;
+
 function serializeOrder(order: OrderWithItems) {
   return {
     id: order.id,
@@ -23,21 +25,23 @@ function serializeOrder(order: OrderWithItems) {
 }
 
 export async function createOrderService(userId: number) {
-  const cart = await prisma.cart.findUnique({
-    where: { userId },
-    include: { items: { include: { product: true } } },
-  });
+  // Read the cart inside the transaction so the order and the cart clear
+  // are based on the same state.
+  return prisma.$transaction(async tx => {
+    const cart = await tx.cart.findUnique({
+      where: { userId },
+      include: { items: { include: { product: true } } },
+    });
 
-  if (!cart || cart.items.length === 0) {
-    throw ApiError.badRequest('Cart is empty');
-  }
+    if (!cart || cart.items.length === 0) {
+      throw ApiError.badRequest('Cart is empty');
+    }
 
-  const total = cart.items.reduce(
-    (sum, item) => sum + item.product.priceDiscount * item.quantity,
-    0,
-  );
+    const total = cart.items.reduce(
+      (sum, item) => sum + item.product.priceDiscount * item.quantity,
+      0,
+    );
 
-  const order = await prisma.$transaction(async tx => {
     const created = await tx.order.create({
       data: {
         userId,
@@ -50,21 +54,19 @@ export async function createOrderService(userId: number) {
           })),
         },
       },
-      include: { items: { include: { product: true } } },
+      include: orderInclude,
     });
 
     await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
 
-    return created;
+    return serializeOrder(created);
   });
-
-  return serializeOrder(order);
 }
 
 export async function getOrdersService(userId: number) {
   const orders = await prisma.order.findMany({
     where: { userId },
-    include: { items: { include: { product: true } } },
+    include: orderInclude,
     orderBy: { createdAt: 'desc' },
   });
 
@@ -74,7 +76,7 @@ export async function getOrdersService(userId: number) {
 export async function getOrderService(userId: number, orderId: number) {
   const order = await prisma.order.findFirst({
     where: { id: orderId, userId },
-    include: { items: { include: { product: true } } },
+    include: orderInclude,
   });
 
   if (!order) {

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { asyncHandler } from '../../utils/asyncHandler.js';
 import {
   getCartService,
   addCartItemService,
@@ -6,67 +6,37 @@ import {
   removeCartItemService,
   clearCartService,
 } from './cart.service.js';
+import { AddCartItemInput, UpdateCartItemInput } from './cart.schema.js';
 
-export async function getCart(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try {
-    const cart = await getCartService(req.user!.id);
-    res.json(cart);
-  } catch (error) {
-    next(error);
-  }
-}
+export const getCart = asyncHandler(async (req, res) => {
+  res.json(await getCartService(req.user!.id));
+});
 
-export async function addCartItem(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try {
-    const { productId } = req.body;
-    const cart = await addCartItemService(req.user!.id, productId);
+export const addCartItem = asyncHandler<{}, unknown, AddCartItemInput, unknown>(
+  async (req, res) => {
+    const cart = await addCartItemService(req.user!.id, req.body.productId);
     res.status(201).json(cart);
-  } catch (error) {
-    next(error);
-  }
-}
+  },
+);
 
-export async function updateCartItem(
-  req: Request<{ productId: string }>,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
-  try {
-    const { qty } = req.body;
+export const updateCartItem = asyncHandler<{ productId: string }, unknown, UpdateCartItemInput, unknown>(
+  async (req, res) => {
     const cart = await updateCartItemService(
       req.user!.id,
-      parseInt(req.params.productId),
-      qty,
+      Number(req.params.productId),
+      req.body.qty,
     );
 
     res.json(cart);
-  } catch (error) {
-    next(error);
-  }
-}
+  },
+);
 
-export async function removeCartItem(
-  req: Request<{ productId: string }>,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
-  try {
-    const cart = await removeCartItemService(
-      req.user!.id,
-      parseInt(req.params.productId),
-    );
+export const removeCartItem = asyncHandler<{ productId: string }, unknown, unknown, unknown>(
+  async (req, res) => {
+    res.json(await removeCartItemService(req.user!.id, Number(req.params.productId)));
+  },
+);
 
-    res.json(cart);
-  } catch (error) {
-    next(error);
-  }
-}
-
-export async function clearCart(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try {
-    const cart = await clearCartService(req.user!.id);
-    res.json(cart);
-  } catch (error) {
-    next(error);
-  }
-}
+export const clearCart = asyncHandler(async (req, res) => {
+  res.json(await clearCartService(req.user!.id));
+});

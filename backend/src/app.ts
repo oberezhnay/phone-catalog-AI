@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { config } from './config/env.js';
-import { errorHandler } from './middleware/errorHandler.js';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { productsRouter } from './modules/products/products.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
 import { cartRouter } from './modules/cart/cart.routes.js';
@@ -26,7 +26,7 @@ export function createApp() {
   );
 
   // Health check
-  app.get('/api/health', (req, res) => {
+  app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok' });
   });
 
@@ -38,6 +38,7 @@ export function createApp() {
   app.use(ordersRouter);
   app.use(reviewsRouter);
 
+  app.use('/api', notFoundHandler);
   app.use(errorHandler);
 
   return app;

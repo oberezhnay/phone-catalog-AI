@@ -1,10 +1,12 @@
 import { z } from 'zod';
 
+const categories = ['phones', 'tablets', 'accessories'] as const;
+
 export const createProductSchema = z.object({
   name: z.string().min(1),
   itemId: z.string().min(1),
   namespaceId: z.string().min(1),
-  category: z.enum(['phones', 'tablets', 'accessories']),
+  category: z.enum(categories),
   capacity: z.string().min(1),
   capacityAvailable: z.array(z.string()),
   color: z.string().min(1),
@@ -32,14 +34,22 @@ export const createProductSchema = z.object({
 
 export const updateProductSchema = createProductSchema.partial();
 
+// The list page sends these from the URL, where bad values used to be ignored.
+// `.catch` keeps that behaviour: an invalid value falls back to its default.
 export const getProductsQuerySchema = z.object({
-  category: z.enum(['phones', 'tablets', 'accessories']).optional(),
-  sort: z.enum(['title', 'price', 'age']).optional(),
-  page: z.coerce.number().int().positive().default(1),
-  perPage: z.enum(['4', '8', '16', 'all']).default('all'),
+  category: z.enum(categories).optional().catch(undefined),
+  sort: z.enum(['title', 'price', 'age']).optional().catch(undefined),
+  page: z.coerce.number().int().positive().catch(1),
+  perPage: z.enum(['4', '8', '16', 'all']).catch('all'),
   search: z.string().optional(),
+});
+
+export const productDetailParamsSchema = z.object({
+  category: z.enum(categories),
+  itemId: z.string().min(1),
 });
 
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 export type GetProductsQuery = z.infer<typeof getProductsQuerySchema>;
+export type ProductDetailParams = z.infer<typeof productDetailParamsSchema>;

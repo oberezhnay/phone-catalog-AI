@@ -1,48 +1,20 @@
-import { Request, Response, NextFunction } from 'express';
+import { asyncHandler } from '../../utils/asyncHandler.js';
 import {
   createOrderService,
   getOrdersService,
   getOrderService,
 } from './orders.service.js';
 
-export async function createOrder(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
-  try {
-    const order = await createOrderService(req.user!.id);
+export const createOrder = asyncHandler(async (req, res) => {
+  res.status(201).json(await createOrderService(req.user!.id));
+});
 
-    res.status(201).json(order);
-  } catch (error) {
-    next(error);
-  }
-}
+export const getOrders = asyncHandler(async (req, res) => {
+  res.json(await getOrdersService(req.user!.id));
+});
 
-export async function getOrders(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
-  try {
-    const orders = await getOrdersService(req.user!.id);
-
-    res.json(orders);
-  } catch (error) {
-    next(error);
-  }
-}
-
-export async function getOrder(
-  req: Request<{ id: string }>,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
-  try {
-    const order = await getOrderService(req.user!.id, parseInt(req.params.id));
-
-    res.json(order);
-  } catch (error) {
-    next(error);
-  }
-}
+export const getOrder = asyncHandler<{ id: string }, unknown, unknown, unknown>(
+  async (req, res) => {
+    res.json(await getOrderService(req.user!.id, Number(req.params.id)));
+  },
+);

@@ -1,60 +1,29 @@
-import { Request, Response, NextFunction } from 'express';
+import { asyncHandler } from '../../utils/asyncHandler.js';
 import {
   getProductReviewsService,
   upsertReviewService,
   deleteReviewService,
 } from './reviews.service.js';
-import { ApiError } from '../../utils/ApiError.js';
+import { ReviewsQuery, UpsertReviewInput } from './reviews.schema.js';
 
-export async function getReviews(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
-  try {
-    const productId = parseInt(req.query.productId as string);
+export const getReviews = asyncHandler(async (req, res) => {
+  // Validated by reviewsQuerySchema (validate(..., 'query') in the routes)
+  const { productId } = req.query as unknown as ReviewsQuery;
+  res.json(await getProductReviewsService(productId));
+});
 
-    if (!productId) {
-      throw ApiError.badRequest('productId is required');
-    }
-
-    const result = await getProductReviewsService(productId);
-
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
-}
-
-export async function upsertReview(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
-  try {
+export const upsertReview = asyncHandler<{}, unknown, UpsertReviewInput, unknown>(
+  async (req, res) => {
     const { productId, rating, comment } = req.body;
-    const review = await upsertReviewService(
-      req.user!.id,
-      productId,
-      rating,
-      comment,
-    );
+    const review = await upsertReviewService(req.user!.id, productId, rating, comment);
 
     res.status(201).json(review);
-  } catch (error) {
-    next(error);
-  }
-}
+  },
+);
 
-export async function deleteReview(
-  req: Request<{ id: string }>,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
-  try {
-    await deleteReviewService(req.user!.id, parseInt(req.params.id));
+export const deleteReview = asyncHandler<{ id: string }, unknown, unknown, unknown>(
+  async (req, res) => {
+    await deleteReviewService(req.user!.id, Number(req.params.id));
     res.status(204).send();
-  } catch (error) {
-    next(error);
-  }
-}
+  },
+);

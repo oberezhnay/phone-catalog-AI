@@ -1,34 +1,20 @@
-import { Request, Response, NextFunction } from 'express';
+import { asyncHandler } from '../../utils/asyncHandler.js';
 import { registerService, loginService, getMeService } from './auth.service.js';
 import { ApiError } from '../../utils/ApiError.js';
+import { LoginInput, RegisterInput } from './auth.schema.js';
 
-export async function register(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try {
-    const result = await registerService(req.body);
-    res.status(201).json(result);
-  } catch (error) {
-    next(error);
+export const register = asyncHandler<{}, unknown, RegisterInput>(async (req, res) => {
+  res.status(201).json(await registerService(req.body));
+});
+
+export const login = asyncHandler<{}, unknown, LoginInput>(async (req, res) => {
+  res.json(await loginService(req.body));
+});
+
+export const me = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    throw ApiError.unauthorized('Authentication required');
   }
-}
 
-export async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try {
-    const result = await loginService(req.body);
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
-}
-
-export async function me(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try {
-    if (!req.user) {
-      throw ApiError.unauthorized('Authentication required');
-    }
-
-    const user = await getMeService(req.user.id);
-    res.json(user);
-  } catch (error) {
-    next(error);
-  }
-}
+  res.json(await getMeService(req.user.id));
+});
