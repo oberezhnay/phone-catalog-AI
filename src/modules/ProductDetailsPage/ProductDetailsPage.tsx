@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Loader } from '../../components/Loader';
 import { BreadCrumbs } from '../shared/components/BreadCrumbs';
 import { BackBtn } from '../shared/components/BackBtn';
-import styles from './ProductDetails.module.scss';
+import styles from './ProductDetailsPage.module.scss';
 import { ProductsSlider } from '../HomePage/components/ProductsSlider';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useCart } from '../../contexts/CartContext';

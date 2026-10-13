@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { Navbar } from '../Navbar';
 import style from './Header.module.scss';
 import { useState } from 'react';
-import { BurgerMenu } from '../Burger.menu';
+import { BurgerMenu } from '../BurgerMenu';
 import { Logo } from '../Logo';
 import classNames from 'classnames';
 import { useFavorites } from '../../contexts/FavoritesContext';

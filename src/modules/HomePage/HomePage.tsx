@@ -3,7 +3,6 @@ import { PicturesSlider } from './components/PicturesSlider';
 import { ProductsSlider } from './components/ProductsSlider';
 import styles from './HomePage.module.scss';
 import { Product } from '../../types/Product';
-// import { ProductDetails } from "../../types/ProductFull";
 import { getProducts } from '../../api/products';
 import { ShopByCategory } from './components/ShopByCategory';
 import { Loader } from '../../components/Loader';
