@@ -3,7 +3,11 @@ import {
   AdminProduct,
   AdminProductInput,
 } from '../../../../types/AdminProduct';
-import { ProductCategory } from '../../../../types/ProductCategory';
+import {
+  isProductCategory,
+  PRODUCT_CATEGORIES,
+  ProductCategory,
+} from '../../../../types/ProductCategory';
 import styles from './ProductForm.module.scss';
 
 type DescriptionBlockForm = {
@@ -212,13 +216,19 @@ export const ProductForm: React.FC<Props> = ({
           Category
           <select
             value={form.category}
-            onChange={e =>
-              updateField('category', e.target.value as ProductCategory)
-            }
+            onChange={e => {
+              const { value } = e.target;
+
+              if (isProductCategory(value)) {
+                updateField('category', value);
+              }
+            }}
           >
-            <option value="phones">phones</option>
-            <option value="tablets">tablets</option>
-            <option value="accessories">accessories</option>
+            {PRODUCT_CATEGORIES.map(category => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
           </select>
         </label>
 
