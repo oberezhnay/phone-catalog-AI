@@ -1,11 +1,28 @@
+import { Prisma, ProductCategory } from '@prisma/client';
 import { prisma } from '../../lib/prisma.js';
 import { CreateProductInput, GetProductsQuery, UpdateProductInput } from './products.schema.js';
 import { ApiError } from '../../utils/ApiError.js';
 
-export async function getProductsService(query: GetProductsQuery) {
-  const { category, sort, page = 1, perPage = 'all', search } = query;
+const DUPLICATE_ITEM_ID = 'Product with this itemId already exists';
 
-  const where: any = {};
+const ORDER_BY: Record<NonNullable<GetProductsQuery['sort']>, Prisma.ProductOrderByWithRelationInput> = {
+  title: { name: 'asc' },
+  price: { priceDiscount: 'asc' },
+  age: { year: 'desc' },
+};
+
+// itemId is unique; the database rejects a duplicate, so no pre-check is needed.
+function rethrowDuplicateItemId(error: unknown): never {
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+    throw ApiError.conflict(DUPLICATE_ITEM_ID);
+  }
+  throw error;
+}
+
+export async function getProductsService(query: GetProductsQuery) {
+  const { category, sort, page, perPage, search } = query;
+
+  const where: Prisma.ProductWhereInput = {};
 
   if (category) {
     where.category = category;
@@ -21,28 +38,14 @@ export async function getProductsService(query: GetProductsQuery) {
   // Get total count for pagination
   const total = await prisma.product.count({ where });
 
-  // Sorting
-  const orderBy: any = {};
-  switch (sort) {
-    case 'title':
-      orderBy.name = 'asc';
-      break;
-    case 'price':
-      orderBy.priceDiscount = 'asc';
-      break;
-    case 'age':
-      orderBy.year = 'desc';
-      break;
-  }
-
   // Pagination
-  const itemsPerPage = perPage === 'all' ? total : parseInt(perPage);
+  const itemsPerPage = perPage === 'all' ? total : Number(perPage);
   const skip = (page - 1) * itemsPerPage;
   const take = perPage === 'all' ? undefined : itemsPerPage;
 
   const items = await prisma.product.findMany({
     where,
-    orderBy: Object.keys(orderBy).length > 0 ? orderBy : undefined,
+    orderBy: sort ? ORDER_BY[sort] : undefined,
     skip,
     take,
   });
@@ -60,12 +63,9 @@ export async function getProductsService(query: GetProductsQuery) {
   };
 }
 
-export async function getProductDetailService(category: string, itemId: string) {
+export async function getProductDetailService(category: ProductCategory, itemId: string) {
   const product = await prisma.product.findFirst({
-    where: {
-      category: category as any,
-      itemId,
-    },
+    where: { category, itemId },
   });
 
   if (!product) {
@@ -80,45 +80,13 @@ export async function getProductDetailService(category: string, itemId: string) 
 }
 
 export async function createProductService(data: CreateProductInput) {
-  // Check if itemId already exists
-  const existing = await prisma.product.findUnique({
-    where: { itemId: data.itemId },
-  });
-
-  if (existing) {
-    throw ApiError.conflict('Product with this itemId already exists');
-  }
-
-  return prisma.product.create({
-    data: {
-      ...data,
-      category: data.category as any,
-    },
-  });
+  return prisma.product.create({ data }).catch(rethrowDuplicateItemId);
 }
 
 export async function updateProductService(id: number, data: UpdateProductInput) {
-  // Check if itemId is being changed to an existing one
-  if (data.itemId) {
-    const existing = await prisma.product.findFirst({
-      where: {
-        itemId: data.itemId,
-        id: { not: id },
-      },
-    });
-
-    if (existing) {
-      throw ApiError.conflict('Product with this itemId already exists');
-    }
-  }
-
-  return prisma.product.update({
-    where: { id },
-    data: {
-      ...data,
-      category: data.category as any,
-    },
-  });
+  return prisma.product
+    .update({ where: { id }, data })
+    .catch(rethrowDuplicateItemId);
 }
 
 export async function deleteProductService(id: number) {

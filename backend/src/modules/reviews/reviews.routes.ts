@@ -5,17 +5,17 @@ import {
   deleteReview,
 } from './reviews.controller.js';
 import { validate } from '../../middleware/validate.js';
-import { upsertReviewSchema } from './reviews.schema.js';
-import { auth, requireAuth } from '../../middleware/auth.js';
+import { reviewsQuerySchema, upsertReviewSchema } from './reviews.schema.js';
+import { idParamsSchema } from '../../utils/schemas.js';
+import { auth } from '../../middleware/auth.js';
 
 export const reviewsRouter = Router();
 
-reviewsRouter.get('/api/reviews', getReviews);
-reviewsRouter.post(
-  '/api/reviews',
+reviewsRouter.get('/api/reviews', validate(reviewsQuerySchema, 'query'), getReviews);
+reviewsRouter.post('/api/reviews', auth, validate(upsertReviewSchema), upsertReview);
+reviewsRouter.delete(
+  '/api/reviews/:id',
   auth,
-  requireAuth,
-  validate(upsertReviewSchema),
-  upsertReview,
+  validate(idParamsSchema, 'params'),
+  deleteReview,
 );
-reviewsRouter.delete('/api/reviews/:id', auth, requireAuth, deleteReview);

@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { describe, expect, it } from 'vitest';
 import { prismaMock } from '../../test/prismaMock.js';
 import {
@@ -7,6 +8,13 @@ import {
   getProductsService,
   updateProductService,
 } from './products.service.js';
+
+// Prisma's unique-constraint error, as thrown when itemId is already taken
+const duplicateItemIdError = () =>
+  new Prisma.PrismaClientKnownRequestError('Unique constraint failed', {
+    code: 'P2002',
+    clientVersion: 'test',
+  });
 
 const product = (overrides: Partial<{ id: number; itemId: string }> = {}) => ({
   id: 1,
@@ -133,36 +141,41 @@ describe('products.service', () => {
   });
 
   describe('createProductService', () => {
-    it('rejects when the itemId is already taken', async () => {
-      prismaMock.product.findUnique.mockResolvedValue(product() as never);
+    it('maps a duplicate itemId (P2002) to a 409 conflict', async () => {
+      prismaMock.product.create.mockRejectedValue(duplicateItemIdError());
 
       await expect(
         createProductService({ itemId: 'phone-1' } as never),
       ).rejects.toMatchObject({ statusCode: 409 });
-      expect(prismaMock.product.create).not.toHaveBeenCalled();
     });
 
-    it('creates the product when the itemId is free', async () => {
-      prismaMock.product.findUnique.mockResolvedValue(null);
+    it('rethrows other database errors unchanged', async () => {
+      const failure = new Error('connection lost');
+      prismaMock.product.create.mockRejectedValue(failure);
+
+      await expect(createProductService({ itemId: 'phone-1' } as never)).rejects.toBe(failure);
+    });
+
+    it('creates the product and does not pre-check itemId', async () => {
       prismaMock.product.create.mockResolvedValue(product() as never);
 
       await createProductService({ itemId: 'phone-1', category: 'phones' } as never);
 
+      expect(prismaMock.product.findUnique).not.toHaveBeenCalled();
       expect(prismaMock.product.create).toHaveBeenCalled();
     });
   });
 
   describe('updateProductService', () => {
-    it('rejects when renaming to an itemId used by a different product', async () => {
-      prismaMock.product.findFirst.mockResolvedValue(product({ id: 2 }) as never);
+    it('maps renaming to an itemId used by another product (P2002) to a 409 conflict', async () => {
+      prismaMock.product.update.mockRejectedValue(duplicateItemIdError());
 
       await expect(
         updateProductService(1, { itemId: 'taken-slug' } as never),
       ).rejects.toMatchObject({ statusCode: 409 });
-      expect(prismaMock.product.update).not.toHaveBeenCalled();
     });
 
-    it('skips the uniqueness check entirely when itemId is not part of the update', async () => {
+    it('updates by id without a separate uniqueness lookup', async () => {
       prismaMock.product.update.mockResolvedValue(product() as never);
 
       await updateProductService(1, { stock: 5 } as never);
@@ -171,20 +184,6 @@ describe('products.service', () => {
       expect(prismaMock.product.update).toHaveBeenCalledWith(
         expect.objectContaining({ where: { id: 1 } }),
       );
-    });
-
-    it('allows keeping your own itemId (no conflicting product found)', async () => {
-      prismaMock.product.findFirst.mockResolvedValue(null);
-      prismaMock.product.update.mockResolvedValue(product() as never);
-
-      await updateProductService(1, { itemId: 'phone-1' } as never);
-
-      expect(prismaMock.product.findFirst).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { itemId: 'phone-1', id: { not: 1 } },
-        }),
-      );
-      expect(prismaMock.product.update).toHaveBeenCalled();
     });
   });
 

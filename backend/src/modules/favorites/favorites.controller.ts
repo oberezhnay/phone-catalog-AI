@@ -1,42 +1,24 @@
-import { Request, Response, NextFunction } from 'express';
+import { asyncHandler } from '../../utils/asyncHandler.js';
 import {
   getFavoritesService,
   addFavoriteService,
   removeFavoriteService,
 } from './favorites.service.js';
+import { AddFavoriteInput } from './favorites.schema.js';
 
-export async function getFavorites(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try {
-    const favorites = await getFavoritesService(req.user!.id);
-    res.json(favorites);
-  } catch (error) {
-    next(error);
-  }
-}
+export const getFavorites = asyncHandler(async (req, res) => {
+  res.json(await getFavoritesService(req.user!.id));
+});
 
-export async function addFavorite(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try {
-    const { productId } = req.body;
-    const favorites = await addFavoriteService(req.user!.id, productId);
+export const addFavorite = asyncHandler<{}, unknown, AddFavoriteInput, unknown>(
+  async (req, res) => {
+    const favorites = await addFavoriteService(req.user!.id, req.body.productId);
     res.status(201).json(favorites);
-  } catch (error) {
-    next(error);
-  }
-}
+  },
+);
 
-export async function removeFavorite(
-  req: Request<{ productId: string }>,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
-  try {
-    const favorites = await removeFavoriteService(
-      req.user!.id,
-      parseInt(req.params.productId),
-    );
-
-    res.json(favorites);
-  } catch (error) {
-    next(error);
-  }
-}
+export const removeFavorite = asyncHandler<{ productId: string }, unknown, unknown, unknown>(
+  async (req, res) => {
+    res.json(await removeFavoriteService(req.user!.id, Number(req.params.productId)));
+  },
+);

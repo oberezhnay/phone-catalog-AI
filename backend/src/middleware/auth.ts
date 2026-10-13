@@ -10,26 +10,21 @@ declare global {
   }
 }
 
-export function auth(req: Request, res: Response, next: NextFunction): void {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
+// Every protected route uses this alone: it either sets req.user or fails.
+export function auth(req: Request, _res: Response, next: NextFunction): void {
+  const [scheme, token] = req.headers.authorization?.split(' ') ?? [];
 
-    if (!token) {
-      throw ApiError.unauthorized('No token provided');
-    }
-
-    const user = verifyToken(token);
-    req.user = user;
-    next();
-  } catch (error) {
-    next(ApiError.unauthorized('Invalid token'));
-  }
-}
-
-export function requireAuth(req: Request, res: Response, next: NextFunction): void {
-  if (!req.user) {
-    next(ApiError.unauthorized('Authentication required'));
+  if (scheme !== 'Bearer' || !token) {
+    next(ApiError.unauthorized('No token provided'));
     return;
   }
+
+  try {
+    req.user = verifyToken(token);
+  } catch {
+    next(ApiError.unauthorized('Invalid token'));
+    return;
+  }
+
   next();
 }

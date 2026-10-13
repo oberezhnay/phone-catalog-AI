@@ -8,24 +8,24 @@ import {
 } from './cart.controller.js';
 import { validate } from '../../middleware/validate.js';
 import { addCartItemSchema, updateCartItemSchema } from './cart.schema.js';
-import { auth, requireAuth } from '../../middleware/auth.js';
+import { productIdParamsSchema } from '../../utils/schemas.js';
+import { auth } from '../../middleware/auth.js';
 
 export const cartRouter = Router();
 
-cartRouter.get('/api/cart', auth, requireAuth, getCart);
-cartRouter.post(
-  '/api/cart',
-  auth,
-  requireAuth,
-  validate(addCartItemSchema),
-  addCartItem,
-);
+cartRouter.get('/api/cart', auth, getCart);
+cartRouter.post('/api/cart', auth, validate(addCartItemSchema), addCartItem);
 cartRouter.patch(
   '/api/cart/:productId',
   auth,
-  requireAuth,
+  validate(productIdParamsSchema, 'params'),
   validate(updateCartItemSchema),
   updateCartItem,
 );
-cartRouter.delete('/api/cart/:productId', auth, requireAuth, removeCartItem);
-cartRouter.delete('/api/cart', auth, requireAuth, clearCart);
+cartRouter.delete(
+  '/api/cart/:productId',
+  auth,
+  validate(productIdParamsSchema, 'params'),
+  removeCartItem,
+);
+cartRouter.delete('/api/cart', auth, clearCart);
