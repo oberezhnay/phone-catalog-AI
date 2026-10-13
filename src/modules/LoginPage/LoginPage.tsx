@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ApiError } from '../../api/http';
-import styles from './LoginPage.module.scss';
+import styles from '../shared/AuthForm.module.scss';
 
 export const LoginPage = () => {
   const { login } = useAuth();

@@ -1,15 +1,17 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as favoritesApi from '../api/favorites';
 import { useAuth } from './AuthContext';
+import { createRequiredContext } from '../utils/createRequiredContext';
 
 type FavoritesContextType = {
   favorites: number[];
   toggleFavorite: (id: number) => void;
 };
 
-const FavoritesContext = createContext<FavoritesContextType | undefined>(
-  undefined,
-);
+const [FavoritesContext, useFavorites] =
+  createRequiredContext<FavoritesContextType>('FavoritesProvider');
+
+export { useFavorites };
 
 export const FavoritesProvider = ({
   children,
@@ -49,14 +51,4 @@ export const FavoritesProvider = ({
       {children}
     </FavoritesContext.Provider>
   );
-};
-
-export const useFavorites = () => {
-  const context = useContext(FavoritesContext);
-
-  if (!context) {
-    throw new Error('Context Error');
-  }
-
-  return context;
 };
