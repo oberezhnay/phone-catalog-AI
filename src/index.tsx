@@ -4,7 +4,7 @@ import { queryClient } from './lib/queryClient';
 import { App } from './App';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { HomePage } from './modules/HomePage';
-import { CatalogPage } from './modules/Catalog';
+import { CatalogPage } from './modules/CatalogPage';
 import { ProductDetails } from './modules/ProductDetailsPage';
 import { CartPage } from './modules/CartPage';
 import { FavoritesPage } from './modules/FavoritesPage';

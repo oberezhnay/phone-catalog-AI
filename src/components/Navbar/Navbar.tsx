@@ -1,6 +1,5 @@
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
-import { Search } from '../Search';
 import style from './Navbar.module.scss';
 
 const getClass = ({ isActive }: { isActive: boolean }) =>
@@ -22,7 +21,5 @@ export const Navbar = () => (
         Accessories
       </NavLink>
     </nav>
-
-    <div className="nav__search">{false && <Search />}</div>
   </div>
 );

@@ -1,7 +1,7 @@
 import { Loader } from '../../components/Loader';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useProducts } from '../../hooks/useProducts';
-import { ProductsList } from '../Catalog/components/ProductsList';
+import { ProductsList } from '../CatalogPage/components/ProductsList';
 import { BreadCrumbs } from '../shared/components/BreadCrumbs';
 import styles from './FavoritesPage.module.scss';
 

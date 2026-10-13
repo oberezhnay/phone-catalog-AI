@@ -39,7 +39,3 @@ export async function createOrder(token: string): Promise<Order> {
 export async function getOrders(token: string): Promise<Order[]> {
   return http<Order[]>('/orders', { token });
 }
-
-export async function getOrder(token: string, id: number): Promise<Order> {
-  return http<Order>(`/orders/${id}`, { token });
-}
