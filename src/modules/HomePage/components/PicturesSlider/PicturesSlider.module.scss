@@ -1,4 +1,4 @@
-@use '@/styles/index' as *;
+@use '@/styles/tokens' as *;
 
 .pictureSlider {
   width: 100%;
@@ -10,7 +10,7 @@
     margin-top: 0;
   }
 
-  @include on-desctop {
+  @include on-desktop {
     max-width: 1136px;
     padding: 0 32px;
     margin: 0 auto;
@@ -29,7 +29,7 @@
       margin: 0 auto;
     }
 
-    @include on-desctop {
+    @include on-desktop {
       height: 400px;
       width: 90%;
     }
@@ -56,7 +56,7 @@
       height: 189px;
     }
 
-    @include on-desctop {
+    @include on-desktop {
       height: 400px;
     }
   }

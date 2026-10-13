@@ -1,4 +1,4 @@
-@use '@/styles/index' as *;
+@use '@/styles/tokens' as *;
 
 .categories-block {
   color: $primary;
@@ -8,7 +8,7 @@
     margin-top: 64px;
   }
 
-  @include on-desctop {
+  @include on-desktop {
     margin-top: 80px;
   }
 

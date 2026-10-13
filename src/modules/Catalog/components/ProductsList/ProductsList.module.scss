@@ -1,4 +1,4 @@
-@use '@/styles/index' as *;
+@use '@/styles/tokens' as *;
 
 .products-list {
   display: flex;
@@ -13,7 +13,7 @@
     justify-items: center;
   }
 
-  @include on-desctop {
+  @include on-desktop {
     grid-template-columns: repeat(4, 1fr);
   }
 }

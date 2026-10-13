@@ -1,4 +1,4 @@
-@use '@/styles/index' as *;
+@use '@/styles/tokens' as *;
 
 .nav__wrapper {
   display: none;
@@ -8,7 +8,7 @@
     margin-left: 16px;
   }
 
-  @include on-desctop {
+  @include on-desktop {
     margin-left: 24px;
   }
 
@@ -16,7 +16,7 @@
     display: flex;
     gap: 32px;
 
-    @include on-desctop {
+    @include on-desktop {
       gap: 64px;
     }
     a {
