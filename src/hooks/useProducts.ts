@@ -1,18 +1,12 @@
-import { useEffect, useState } from 'react';
-import { Product } from '../types/Product';
-import { getProducts } from '../api/products';
+import { useProductsQuery } from './queries/useProductsQuery';
 
+// All products, for pages that filter them on the client (cart, favourites).
 export const useProducts = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { data, isLoading, isError } = useProductsQuery();
 
-  useEffect(() => {
-    getProducts()
-      .then(data => setProducts(data.items))
-      .catch(() => setError('Failed to load products'))
-      .finally(() => setIsLoading(false));
-  }, []);
-
-  return { products, isLoading, error };
+  return {
+    products: data?.items ?? [],
+    isLoading,
+    error: isError ? 'Failed to load products' : '',
+  };
 };

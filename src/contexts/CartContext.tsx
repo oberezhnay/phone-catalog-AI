@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import * as cartApi from '../api/cart';
 import { useAuth } from './AuthContext';
 import { createRequiredContext } from '../utils/createRequiredContext';
-
-export type CartItem = {
-  id: number;
-  qty: number;
-};
+import { useCartMutation, useCartQuery } from '../hooks/queries/useCartQuery';
+import { CartItem } from '../types/Cart';
 
 type CartContextType = {
   cart: CartItem[];
@@ -24,81 +21,55 @@ export { useCart };
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const { token, isAuthenticated } = useAuth();
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const { data: cart = [] } = useCartQuery(isAuthenticated ? token : null);
+  const { mutate } = useCartMutation();
 
-  useEffect(() => {
-    if (!isAuthenticated || !token) {
-      setCart([]);
-
-      return;
-    }
-
-    cartApi
-      .getCart(token)
-      .then(setCart)
-      .catch(() => setCart([]));
-  }, [isAuthenticated, token]);
-
-  const toggleCart = (id: number) => {
+  const change = (request: (token: string) => Promise<CartItem[]>) => {
     if (!token) {
       return;
     }
 
-    const exists = cart.find(item => item.id === id);
-    const request = exists
-      ? cartApi.removeCartItem(token, id)
-      : cartApi.addCartItem(token, id);
+    mutate({ token, change: request });
+  };
 
-    request.then(setCart);
+  const toggleCart = (id: number) => {
+    const exists = cart.find(item => item.id === id);
+
+    change(t =>
+      exists ? cartApi.removeCartItem(t, id) : cartApi.addCartItem(t, id),
+    );
   };
 
   const removeFromCart = (id: number) => {
-    if (!token) {
-      return;
-    }
-
-    cartApi.removeCartItem(token, id).then(setCart);
+    change(t => cartApi.removeCartItem(t, id));
   };
 
   const increase = (id: number) => {
-    if (!token) {
-      return;
-    }
-
     const item = cart.find(p => p.id === id);
 
     if (!item) {
       return;
     }
 
-    cartApi.updateCartItem(token, id, item.qty + 1).then(setCart);
+    change(t => cartApi.updateCartItem(t, id, item.qty + 1));
   };
 
   const decrease = (id: number) => {
-    if (!token) {
-      return;
-    }
-
     const item = cart.find(p => p.id === id);
 
     if (!item) {
       return;
     }
 
-    const request =
+    change(t =>
       item.qty <= 1
-        ? cartApi.removeCartItem(token, id)
-        : cartApi.updateCartItem(token, id, item.qty - 1);
-
-    request.then(setCart);
+        ? cartApi.removeCartItem(t, id)
+        : cartApi.updateCartItem(t, id, item.qty - 1),
+    );
   };
 
   const clearCart = () => {
-    if (!token) {
-      return;
-    }
-
-    cartApi.clearCart(token).then(setCart);
+    change(t => cartApi.clearCart(t));
   };
 
   return (

@@ -1,5 +1,5 @@
 import { http } from './http';
-import { CartItem } from '../contexts/CartContext';
+import { CartItem } from '../types/Cart';
 
 export async function getCart(token: string): Promise<CartItem[]> {
   return http<CartItem[]>('/cart', { token });

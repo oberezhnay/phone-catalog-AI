@@ -1,7 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import * as favoritesApi from '../api/favorites';
 import { useAuth } from './AuthContext';
 import { createRequiredContext } from '../utils/createRequiredContext';
+import {
+  useFavoritesMutation,
+  useFavoritesQuery,
+} from '../hooks/queries/useFavoritesQuery';
 
 type FavoritesContextType = {
   favorites: number[];
@@ -19,31 +23,25 @@ export const FavoritesProvider = ({
   children: React.ReactNode;
 }) => {
   const { token, isAuthenticated } = useAuth();
-  const [favorites, setFavorites] = useState<number[]>([]);
-
-  useEffect(() => {
-    if (!isAuthenticated || !token) {
-      setFavorites([]);
-
-      return;
-    }
-
-    favoritesApi
-      .getFavorites(token)
-      .then(setFavorites)
-      .catch(() => setFavorites([]));
-  }, [isAuthenticated, token]);
+  const { data: favorites = [] } = useFavoritesQuery(
+    isAuthenticated ? token : null,
+  );
+  const { mutate } = useFavoritesMutation();
 
   const toggleFavorite = (id: number) => {
     if (!token) {
       return;
     }
 
-    const request = favorites.includes(id)
-      ? favoritesApi.removeFavorite(token, id)
-      : favoritesApi.addFavorite(token, id);
+    const isFavorite = favorites.includes(id);
 
-    request.then(setFavorites);
+    mutate({
+      token,
+      change: t =>
+        isFavorite
+          ? favoritesApi.removeFavorite(t, id)
+          : favoritesApi.addFavorite(t, id),
+    });
   };
 
   return (
