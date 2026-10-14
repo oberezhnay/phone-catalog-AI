@@ -1,11 +1,18 @@
 import { Prisma, ProductCategory } from '@prisma/client';
 import { prisma } from '../../lib/prisma.js';
-import { CreateProductInput, GetProductsQuery, UpdateProductInput } from './products.schema.js';
+import {
+  CreateProductInput,
+  GetProductsQuery,
+  UpdateProductInput,
+} from './products.schema.js';
 import { ApiError } from '../../utils/ApiError.js';
 
 const DUPLICATE_ITEM_ID = 'Product with this itemId already exists';
 
-const ORDER_BY: Record<NonNullable<GetProductsQuery['sort']>, Prisma.ProductOrderByWithRelationInput> = {
+const ORDER_BY: Record<
+  NonNullable<GetProductsQuery['sort']>,
+  Prisma.ProductOrderByWithRelationInput
+> = {
   title: { name: 'asc' },
   price: { priceDiscount: 'asc' },
   age: { year: 'desc' },
@@ -13,7 +20,10 @@ const ORDER_BY: Record<NonNullable<GetProductsQuery['sort']>, Prisma.ProductOrde
 
 // itemId is unique; the database rejects a duplicate, so no pre-check is needed.
 function rethrowDuplicateItemId(error: unknown): never {
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === 'P2002'
+  ) {
     throw ApiError.conflict(DUPLICATE_ITEM_ID);
   }
   throw error;
@@ -51,7 +61,7 @@ export async function getProductsService(query: GetProductsQuery) {
   });
 
   // Map to list format (fullPrice/price instead of priceRegular/priceDiscount)
-  const mappedItems = items.map((product) => ({
+  const mappedItems = items.map(product => ({
     ...product,
     fullPrice: product.priceRegular,
     price: product.priceDiscount,
@@ -63,7 +73,10 @@ export async function getProductsService(query: GetProductsQuery) {
   };
 }
 
-export async function getProductDetailService(category: ProductCategory, itemId: string) {
+export async function getProductDetailService(
+  category: ProductCategory,
+  itemId: string,
+) {
   const product = await prisma.product.findFirst({
     where: { category, itemId },
   });
@@ -83,7 +96,10 @@ export async function createProductService(data: CreateProductInput) {
   return prisma.product.create({ data }).catch(rethrowDuplicateItemId);
 }
 
-export async function updateProductService(id: number, data: UpdateProductInput) {
+export async function updateProductService(
+  id: number,
+  data: UpdateProductInput,
+) {
   return prisma.product
     .update({ where: { id }, data })
     .catch(rethrowDuplicateItemId);

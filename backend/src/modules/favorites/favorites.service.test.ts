@@ -22,7 +22,10 @@ describe('favorites.service', () => {
     });
 
     it('maps favorites to a flat list of product ids', async () => {
-      prismaMock.favorite.findMany.mockResolvedValue([favorite(5), favorite(7)]);
+      prismaMock.favorite.findMany.mockResolvedValue([
+        favorite(5),
+        favorite(7),
+      ]);
 
       await expect(getFavoritesService(1)).resolves.toEqual([5, 7]);
     });

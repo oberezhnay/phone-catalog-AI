@@ -7,7 +7,9 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32),
   CORS_ORIGIN: z.string(),
   PORT: z.coerce.number().default(4000),
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
 });
 
 export type Env = z.infer<typeof envSchema>;

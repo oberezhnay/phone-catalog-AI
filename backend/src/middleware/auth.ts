@@ -3,6 +3,8 @@ import { verifyToken, JwtPayload } from '../utils/jwt.js';
 import { ApiError } from '../utils/ApiError.js';
 
 declare global {
+  // Express documents this namespace as the way to augment Request.
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: JwtPayload;

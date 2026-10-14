@@ -105,7 +105,10 @@ describe('cart.service', () => {
   describe('removeCartItemService', () => {
     it('deletes the matching item and returns the refreshed cart', async () => {
       prismaMock.cart.upsert.mockResolvedValue(cart);
-      prismaMock.cart.findUnique.mockResolvedValue({ ...cart, items: [] } as never);
+      prismaMock.cart.findUnique.mockResolvedValue({
+        ...cart,
+        items: [],
+      } as never);
 
       const result = await removeCartItemService(1, 5);
 
