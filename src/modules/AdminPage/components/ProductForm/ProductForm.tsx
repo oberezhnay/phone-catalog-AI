@@ -6,141 +6,79 @@ import {
 import {
   isProductCategory,
   PRODUCT_CATEGORIES,
-  ProductCategory,
 } from '../../../../types/ProductCategory';
 import styles from './ProductForm.module.scss';
+import {
+  createEmptyForm,
+  DescriptionBlockForm,
+  emptyDescriptionBlock,
+  FormState,
+  TextFieldKey,
+  toFormState,
+  toPayload,
+} from './productForm.mappers';
 
-type DescriptionBlockForm = {
-  title: string;
-  text: string;
+type FieldConfig = {
+  key: TextFieldKey;
+  label: string;
+  type?: 'number';
+  required?: boolean;
+  placeholder?: string;
 };
 
-type FormState = {
-  name: string;
-  itemId: string;
-  namespaceId: string;
-  category: ProductCategory;
-  capacity: string;
-  capacityAvailable: string;
-  color: string;
-  colorsAvailable: string;
-  priceRegular: string;
-  priceDiscount: string;
-  screen: string;
-  resolution: string;
-  processor: string;
-  ram: string;
-  camera: string;
-  zoom: string;
-  cell: string;
-  year: string;
-  image: string;
-  images: string;
-  stock: string;
-  description: DescriptionBlockForm[];
-};
+// The category select sits between these two groups, as in the page layout.
+const FIELDS_BEFORE_CATEGORY: FieldConfig[] = [
+  { key: 'name', label: 'Name', required: true },
+];
 
-const emptyForm: FormState = {
-  name: '',
-  itemId: '',
-  namespaceId: '',
-  category: 'phones',
-  capacity: '',
-  capacityAvailable: '',
-  color: '',
-  colorsAvailable: '',
-  priceRegular: '',
-  priceDiscount: '',
-  screen: '',
-  resolution: '',
-  processor: '',
-  ram: '',
-  camera: '',
-  zoom: '',
-  cell: '',
-  year: new Date().getFullYear().toString(),
-  image: '',
-  images: '',
-  stock: '20',
-  description: [{ title: '', text: '' }],
-};
-
-function toDescriptionFormBlocks(
-  description: AdminProduct['description'],
-): DescriptionBlockForm[] {
-  if (description.length === 0) {
-    return [{ title: '', text: '' }];
-  }
-
-  return description.map(block => ({
-    title: block.title,
-    text: block.text.join('\n'),
-  }));
-}
-
-const toFormState = (product: AdminProduct): FormState => ({
-  name: product.name,
-  itemId: product.itemId,
-  namespaceId: product.namespaceId,
-  category: product.category,
-  capacity: product.capacity,
-  capacityAvailable: product.capacityAvailable.join(', '),
-  color: product.color,
-  colorsAvailable: product.colorsAvailable.join(', '),
-  priceRegular: product.priceRegular.toString(),
-  priceDiscount: product.priceDiscount.toString(),
-  screen: product.screen,
-  resolution: product.resolution || '',
-  processor: product.processor || '',
-  ram: product.ram,
-  camera: product.camera || '',
-  zoom: product.zoom || '',
-  cell: product.cell.join(', '),
-  year: product.year.toString(),
-  image: product.image,
-  images: product.images.join(', '),
-  stock: product.stock.toString(),
-  description: toDescriptionFormBlocks(product.description),
-});
-
-const splitList = (value: string) =>
-  value
-    .split(',')
-    .map(item => item.trim())
-    .filter(Boolean);
-
-const toPayload = (form: FormState): AdminProductInput => ({
-  name: form.name.trim(),
-  itemId: form.itemId.trim(),
-  namespaceId: form.namespaceId.trim(),
-  category: form.category,
-  capacity: form.capacity.trim(),
-  capacityAvailable: splitList(form.capacityAvailable),
-  color: form.color.trim(),
-  colorsAvailable: splitList(form.colorsAvailable),
-  priceRegular: Number(form.priceRegular),
-  priceDiscount: Number(form.priceDiscount),
-  screen: form.screen.trim(),
-  resolution: form.resolution.trim() || undefined,
-  processor: form.processor.trim() || undefined,
-  ram: form.ram.trim(),
-  camera: form.camera.trim() || undefined,
-  zoom: form.zoom.trim() || undefined,
-  cell: splitList(form.cell),
-  year: Number(form.year),
-  image: form.image.trim(),
-  images: splitList(form.images),
-  stock: Number(form.stock),
-  description: form.description
-    .filter(block => block.title.trim() || block.text.trim())
-    .map(block => ({
-      title: block.title.trim(),
-      text: block.text
-        .split('\n')
-        .map(line => line.trim())
-        .filter(Boolean),
-    })),
-});
+const FIELDS_AFTER_CATEGORY: FieldConfig[] = [
+  { key: 'itemId', label: 'Item ID (slug)', required: true },
+  { key: 'namespaceId', label: 'Namespace ID', required: true },
+  { key: 'capacity', label: 'Capacity', required: true },
+  {
+    key: 'capacityAvailable',
+    label: 'Capacity available (comma-separated)',
+    placeholder: '32GB, 64GB, 128GB',
+  },
+  { key: 'color', label: 'Color', required: true },
+  {
+    key: 'colorsAvailable',
+    label: 'Colors available (comma-separated)',
+    placeholder: 'black, gold, silver',
+  },
+  {
+    key: 'priceRegular',
+    label: 'Regular price',
+    type: 'number',
+    required: true,
+  },
+  {
+    key: 'priceDiscount',
+    label: 'Discount price',
+    type: 'number',
+    required: true,
+  },
+  { key: 'screen', label: 'Screen', required: true },
+  { key: 'resolution', label: 'Resolution' },
+  { key: 'processor', label: 'Processor' },
+  { key: 'ram', label: 'RAM', required: true },
+  { key: 'camera', label: 'Camera' },
+  { key: 'zoom', label: 'Zoom' },
+  {
+    key: 'cell',
+    label: 'Cell (comma-separated)',
+    placeholder: 'GPRS, EDGE, LTE',
+  },
+  { key: 'year', label: 'Year', type: 'number', required: true },
+  { key: 'stock', label: 'Stock', type: 'number', required: true },
+  {
+    key: 'image',
+    label: 'Main image URL',
+    placeholder: '/img/phones/.../00.webp',
+    required: true,
+  },
+  { key: 'images', label: 'Gallery images (comma-separated URLs)' },
+];
 
 type Props = {
   initialProduct?: AdminProduct;
@@ -158,7 +96,7 @@ export const ProductForm: React.FC<Props> = ({
   submitLabel,
 }) => {
   const [form, setForm] = useState<FormState>(
-    initialProduct ? toFormState(initialProduct) : emptyForm,
+    initialProduct ? toFormState(initialProduct) : createEmptyForm(),
   );
 
   const updateField = <K extends keyof FormState>(
@@ -184,7 +122,7 @@ export const ProductForm: React.FC<Props> = ({
   const addDescriptionBlock = () => {
     setForm(prev => ({
       ...prev,
-      description: [...prev.description, { title: '', text: '' }],
+      description: [...prev.description, emptyDescriptionBlock()],
     }));
   };
 
@@ -200,17 +138,23 @@ export const ProductForm: React.FC<Props> = ({
     onSubmit(toPayload(form));
   };
 
+  const renderField = (field: FieldConfig) => (
+    <label key={field.key} className={styles.field}>
+      {field.label}
+      <input
+        type={field.type}
+        value={form[field.key]}
+        onChange={e => updateField(field.key, e.target.value)}
+        placeholder={field.placeholder}
+        required={field.required}
+      />
+    </label>
+  );
+
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <div className={styles.grid}>
-        <label className={styles.field}>
-          Name
-          <input
-            value={form.name}
-            onChange={e => updateField('name', e.target.value)}
-            required
-          />
-        </label>
+        {FIELDS_BEFORE_CATEGORY.map(renderField)}
 
         <label className={styles.field}>
           Category
@@ -232,176 +176,7 @@ export const ProductForm: React.FC<Props> = ({
           </select>
         </label>
 
-        <label className={styles.field}>
-          Item ID (slug)
-          <input
-            value={form.itemId}
-            onChange={e => updateField('itemId', e.target.value)}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          Namespace ID
-          <input
-            value={form.namespaceId}
-            onChange={e => updateField('namespaceId', e.target.value)}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          Capacity
-          <input
-            value={form.capacity}
-            onChange={e => updateField('capacity', e.target.value)}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          Capacity available (comma-separated)
-          <input
-            value={form.capacityAvailable}
-            onChange={e => updateField('capacityAvailable', e.target.value)}
-            placeholder="32GB, 64GB, 128GB"
-          />
-        </label>
-
-        <label className={styles.field}>
-          Color
-          <input
-            value={form.color}
-            onChange={e => updateField('color', e.target.value)}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          Colors available (comma-separated)
-          <input
-            value={form.colorsAvailable}
-            onChange={e => updateField('colorsAvailable', e.target.value)}
-            placeholder="black, gold, silver"
-          />
-        </label>
-
-        <label className={styles.field}>
-          Regular price
-          <input
-            type="number"
-            value={form.priceRegular}
-            onChange={e => updateField('priceRegular', e.target.value)}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          Discount price
-          <input
-            type="number"
-            value={form.priceDiscount}
-            onChange={e => updateField('priceDiscount', e.target.value)}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          Screen
-          <input
-            value={form.screen}
-            onChange={e => updateField('screen', e.target.value)}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          Resolution
-          <input
-            value={form.resolution}
-            onChange={e => updateField('resolution', e.target.value)}
-          />
-        </label>
-
-        <label className={styles.field}>
-          Processor
-          <input
-            value={form.processor}
-            onChange={e => updateField('processor', e.target.value)}
-          />
-        </label>
-
-        <label className={styles.field}>
-          RAM
-          <input
-            value={form.ram}
-            onChange={e => updateField('ram', e.target.value)}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          Camera
-          <input
-            value={form.camera}
-            onChange={e => updateField('camera', e.target.value)}
-          />
-        </label>
-
-        <label className={styles.field}>
-          Zoom
-          <input
-            value={form.zoom}
-            onChange={e => updateField('zoom', e.target.value)}
-          />
-        </label>
-
-        <label className={styles.field}>
-          Cell (comma-separated)
-          <input
-            value={form.cell}
-            onChange={e => updateField('cell', e.target.value)}
-            placeholder="GPRS, EDGE, LTE"
-          />
-        </label>
-
-        <label className={styles.field}>
-          Year
-          <input
-            type="number"
-            value={form.year}
-            onChange={e => updateField('year', e.target.value)}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          Stock
-          <input
-            type="number"
-            value={form.stock}
-            onChange={e => updateField('stock', e.target.value)}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          Main image URL
-          <input
-            value={form.image}
-            onChange={e => updateField('image', e.target.value)}
-            placeholder="/img/phones/.../00.webp"
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          Gallery images (comma-separated URLs)
-          <input
-            value={form.images}
-            onChange={e => updateField('images', e.target.value)}
-          />
-        </label>
+        {FIELDS_AFTER_CATEGORY.map(renderField)}
       </div>
 
       <div className={styles.descriptions}>

@@ -7,10 +7,12 @@ import { useAuth } from '../../contexts/AuthContext';
 import { deleteAdminProduct } from '../../api/admin';
 import { Modal } from '../shared/components/Modal';
 import { AdminProduct } from '../../types/AdminProduct';
+import { AdminProductCard } from './components/AdminProductCard';
+import { AdminProductRow } from './components/AdminProductRow';
 import styles from './AdminPage.module.scss';
 
 export const AdminPage = () => {
-  const { data: products, isLoading, error } = useAdminProductsQuery();
+  const { data: products = [], isLoading, error } = useAdminProductsQuery();
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
@@ -47,19 +49,6 @@ export const AdminPage = () => {
     return <p>Failed to load products.</p>;
   }
 
-  const renderActions = (product: AdminProduct) => (
-    <div className={styles.actions}>
-      <NavLink to={`/admin/products/${product.id}/edit`}>Edit</NavLink>
-      <button
-        type="button"
-        className={styles.delete}
-        onClick={() => setProductToDelete(product)}
-      >
-        Delete
-      </button>
-    </div>
-  );
-
   return (
     <div className="container">
       <div className={styles.header}>
@@ -71,31 +60,12 @@ export const AdminPage = () => {
 
       {/* Mobile: card list (below tablet breakpoint) */}
       <ul className={styles['card-list']}>
-        {products?.map(product => (
-          <li key={product.id} className={styles.card}>
-            <div className={styles['card-top']}>
-              <img
-                src={product.image}
-                alt={product.name}
-                className={styles.thumb}
-              />
-              <div>
-                <p className={styles['card-name']}>{product.name}</p>
-                <p className={styles['card-category']}>{product.category}</p>
-              </div>
-            </div>
-
-            <div className={styles['card-row']}>
-              <span>Price</span>
-              <span>${product.priceDiscount}</span>
-            </div>
-            <div className={styles['card-row']}>
-              <span>Stock</span>
-              <span>{product.stock}</span>
-            </div>
-
-            {renderActions(product)}
-          </li>
+        {products.map(product => (
+          <AdminProductCard
+            key={product.id}
+            product={product}
+            onDelete={setProductToDelete}
+          />
         ))}
       </ul>
 
@@ -113,21 +83,12 @@ export const AdminPage = () => {
             </tr>
           </thead>
           <tbody>
-            {products?.map(product => (
-              <tr key={product.id}>
-                <td>
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className={styles.thumb}
-                  />
-                </td>
-                <td>{product.name}</td>
-                <td>{product.category}</td>
-                <td>${product.priceDiscount}</td>
-                <td>{product.stock}</td>
-                <td>{renderActions(product)}</td>
-              </tr>
+            {products.map(product => (
+              <AdminProductRow
+                key={product.id}
+                product={product}
+                onDelete={setProductToDelete}
+              />
             ))}
           </tbody>
         </table>
