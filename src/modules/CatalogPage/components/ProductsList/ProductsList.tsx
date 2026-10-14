@@ -1,6 +1,6 @@
 import React from 'react';
-import { Product } from '../../../../types/Product';
-import { ProductCard } from '../../../shared';
+import { Product } from '@/types/Product';
+import { ProductCard } from '@/modules/shared';
 import styles from './ProductsList.module.scss';
 
 type Props = {

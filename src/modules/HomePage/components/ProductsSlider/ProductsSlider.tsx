@@ -3,8 +3,8 @@ import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Swiper as SwiperType } from 'swiper';
 import React, { useEffect, useRef, useState } from 'react';
-import { ProductCard } from '../../../shared';
-import { Product } from '../../../../types/Product';
+import { ProductCard } from '@/modules/shared';
+import { Product } from '@/types/Product';
 
 export type PriceView = 'default' | 'fullOnly';
 
@@ -31,14 +31,14 @@ export const ProductsSlider: React.FC<Props> = ({
     }
   }, []);
 
-  const onInitHandler = swiper => {
+  const onInitHandler = (swiper: SwiperType) => {
     swiperRef.current = swiper;
 
     setIsBeginning(swiper.isBeginning);
     setIsEnd(swiper.isEnd);
   };
 
-  const onSlideChangeHandler = swiper => {
+  const onSlideChangeHandler = (swiper: SwiperType) => {
     setIsBeginning(swiper.isBeginning);
     setIsEnd(swiper.isEnd);
   };
@@ -79,7 +79,7 @@ export const ProductsSlider: React.FC<Props> = ({
         }}
         onBeforeInit={swiper => {
           const navigation = {
-            ...swiper.params.navigation,
+            ...(swiper.params.navigation as object),
             prevEl: prevRef.current,
             nextEl: nextRef.current,
           };

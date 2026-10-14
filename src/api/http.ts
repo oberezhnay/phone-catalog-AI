@@ -17,9 +17,9 @@ interface FetchOptions extends RequestInit {
 async function http<T>(url: string, options: FetchOptions = {}): Promise<T> {
   const { token, ...init } = options;
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(init.headers || {}),
+    ...(init.headers as Record<string, string> | undefined),
   };
 
   if (token) {

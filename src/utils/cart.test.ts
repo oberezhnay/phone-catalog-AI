@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getTotalCartItems } from './cart';
-import { CartItem } from '../types/Cart';
+import { CartItem } from '@/types/Cart';
 
 describe('getTotalCartItems', () => {
   it('returns 0 for an empty cart', () => {

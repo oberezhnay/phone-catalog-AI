@@ -1,6 +1,6 @@
 import { http } from './http';
-import { Product } from '../types/Product';
-import { ProductDescription } from '../types/ProductFull';
+import { Product } from '@/types/Product';
+import { ProductDescription } from '@/types/ProductFull';
 
 export interface GetProductsParams {
   category?: string;

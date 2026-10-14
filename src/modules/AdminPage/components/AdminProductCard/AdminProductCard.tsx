@@ -1,5 +1,5 @@
-import { AdminProduct } from '../../../../types/AdminProduct';
-import { ProductActions } from '../ProductActions';
+import { AdminProduct } from '@/types/AdminProduct';
+import { ProductActions } from '@/modules/AdminPage/components/ProductActions';
 import styles from './AdminProductCard.module.scss';
 
 type Props = {

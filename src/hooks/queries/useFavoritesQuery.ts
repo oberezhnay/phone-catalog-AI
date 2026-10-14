@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import * as favoritesApi from '../../api/favorites';
+import * as favoritesApi from '@/api/favorites';
 
 export const favoritesQueryKey = (token: string | null) =>
   ['favorites', token] as const;

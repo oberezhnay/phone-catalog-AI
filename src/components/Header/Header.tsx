@@ -1,14 +1,14 @@
 import { NavLink } from 'react-router-dom';
-import { Navbar } from '../Navbar';
+import { Navbar } from '@/components/Navbar';
 import style from './Header.module.scss';
 import { useState } from 'react';
-import { BurgerMenu } from '../BurgerMenu';
-import { Logo } from '../Logo';
+import { BurgerMenu } from '@/components/BurgerMenu';
+import { Logo } from '@/components/Logo';
 import classNames from 'classnames';
-import { useFavorites } from '../../contexts/FavoritesContext';
-import { useCart } from '../../contexts/CartContext';
-import { useAuth } from '../../contexts/AuthContext';
-import { getTotalCartItems } from '../../utils/cart';
+import { useFavorites } from '@/contexts/FavoritesContext';
+import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { getTotalCartItems } from '@/utils/cart';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

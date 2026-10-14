@@ -1,9 +1,9 @@
 import React from 'react';
-import * as cartApi from '../api/cart';
+import * as cartApi from '@/api/cart';
 import { useAuth } from './AuthContext';
-import { createRequiredContext } from '../utils/createRequiredContext';
-import { useCartMutation, useCartQuery } from '../hooks/queries/useCartQuery';
-import { CartItem } from '../types/Cart';
+import { createRequiredContext } from '@/utils/createRequiredContext';
+import { useCartMutation, useCartQuery } from '@/hooks/queries/useCartQuery';
+import { CartItem } from '@/types/Cart';
 
 type CartContextType = {
   cart: CartItem[];

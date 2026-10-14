@@ -1,8 +1,8 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { useAuth } from '../../../../contexts/AuthContext';
-import { useRequireAuth } from '../../../../hooks/useRequireAuth';
-import * as reviewsApi from '../../../../api/reviews';
-import { Review } from '../../../../api/reviews';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
+import * as reviewsApi from '@/api/reviews';
+import { Review } from '@/api/reviews';
 import styles from './ProductReviews.module.scss';
 
 type Props = {

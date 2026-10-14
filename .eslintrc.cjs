@@ -104,5 +104,9 @@ module.exports = {
     react: {
       version: 'detect',
     },
+    'import/resolver': {
+      typescript: { project: './tsconfig.json' },
+      node: { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
+    },
   },
 };

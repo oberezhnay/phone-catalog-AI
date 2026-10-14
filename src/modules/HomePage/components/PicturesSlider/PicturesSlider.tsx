@@ -33,7 +33,7 @@ export const PicturesSlider = () => {
         }}
         onBeforeInit={swiper => {
           const navigation = {
-            ...swiper.params.navigation,
+            ...(swiper.params.navigation as object),
             prevEl: prevRef.current,
             nextEl: nextRef.current,
           };

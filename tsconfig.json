@@ -5,6 +5,8 @@
   ],
   "compilerOptions": {
     "sourceMap": false,
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] }
   }
 }

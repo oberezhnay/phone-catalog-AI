@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import styles from './BreadCrumbs.module.scss';
 import React from 'react';
-import { ProductCategory } from '../../../../types/ProductCategory';
+import { ProductCategory } from '@/types/ProductCategory';
 
 type Props = {
   category: ProductCategory | 'Favourites';

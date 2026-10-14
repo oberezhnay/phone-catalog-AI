@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader } from '../../components/Loader';
-import { useCart } from '../../contexts/CartContext';
-import { useAuth } from '../../contexts/AuthContext';
-import { useProducts } from '../../hooks/useProducts';
-import { BackBtn } from '../shared/components/BackBtn';
+import { Loader } from '@/components/Loader';
+import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useProducts } from '@/hooks/useProducts';
+import { BackBtn } from '@/modules/shared/components/BackBtn';
 import styles from './CartPage.module.scss';
 import { CartItem } from './components/CartItem';
-import { Modal } from '../shared/components/Modal';
-import { getTotalCartItems } from '../../utils/cart';
-import { createOrder } from '../../api/orders';
+import { Modal } from '@/modules/shared/components/Modal';
+import { getTotalCartItems } from '@/utils/cart';
+import { createOrder } from '@/api/orders';
 
 export const CartPage = () => {
   const { cart, clearCart } = useCart();
@@ -35,7 +35,7 @@ export const CartPage = () => {
   const getItemQty = (itemId: number) => {
     const cartItem = cart.find(p => p.id === itemId);
 
-    return cartItem?.qty;
+    return cartItem?.qty ?? 1;
   };
 
   const getTotalPrice = () => {

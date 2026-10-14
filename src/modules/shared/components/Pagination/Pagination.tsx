@@ -1,5 +1,5 @@
 import React from 'react';
-import { PerPageType } from '../../../CatalogPage';
+import { PerPageType } from '@/modules/CatalogPage';
 import styles from './Pagination.module.scss';
 
 interface Props {

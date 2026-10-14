@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader } from '../../components/Loader';
-import { useAdminProductsQuery } from '../../hooks/queries';
-import { useAuth } from '../../contexts/AuthContext';
-import { deleteAdminProduct } from '../../api/admin';
-import { Modal } from '../shared/components/Modal';
-import { AdminProduct } from '../../types/AdminProduct';
+import { Loader } from '@/components/Loader';
+import { useAdminProductsQuery } from '@/hooks/queries';
+import { useAuth } from '@/contexts/AuthContext';
+import { deleteAdminProduct } from '@/api/admin';
+import { Modal } from '@/modules/shared/components/Modal';
+import { AdminProduct } from '@/types/AdminProduct';
 import { AdminProductCard } from './components/AdminProductCard';
 import { AdminProductRow } from './components/AdminProductRow';
 import styles from './AdminPage.module.scss';

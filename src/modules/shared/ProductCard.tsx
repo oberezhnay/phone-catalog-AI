@@ -1,12 +1,12 @@
 import React from 'react';
-import { Product } from '../../types/Product';
+import { Product } from '@/types/Product';
 
 import styles from './ProductCard.module.scss';
 import { NavLink } from 'react-router-dom';
-import { useFavorites } from '../../contexts/FavoritesContext';
-import { useCart } from '../../contexts/CartContext';
-import { useRequireAuth } from '../../hooks/useRequireAuth';
-import { PriceView } from '../HomePage/components/ProductsSlider';
+import { useFavorites } from '@/contexts/FavoritesContext';
+import { useCart } from '@/contexts/CartContext';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { PriceView } from '@/modules/HomePage/components/ProductsSlider';
 
 type Props = {
   product: Product;

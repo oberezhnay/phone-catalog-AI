@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { AdminProduct } from '../../../../types/AdminProduct';
+import { AdminProduct } from '@/types/AdminProduct';
 import {
   createEmptyForm,
   splitList,

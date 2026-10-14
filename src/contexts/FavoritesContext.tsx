@@ -1,11 +1,11 @@
 import React from 'react';
-import * as favoritesApi from '../api/favorites';
+import * as favoritesApi from '@/api/favorites';
 import { useAuth } from './AuthContext';
-import { createRequiredContext } from '../utils/createRequiredContext';
+import { createRequiredContext } from '@/utils/createRequiredContext';
 import {
   useFavoritesMutation,
   useFavoritesQuery,
-} from '../hooks/queries/useFavoritesQuery';
+} from '@/hooks/queries/useFavoritesQuery';
 
 type FavoritesContextType = {
   favorites: number[];

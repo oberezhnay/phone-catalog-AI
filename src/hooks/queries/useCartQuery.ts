@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import * as cartApi from '../../api/cart';
-import { CartItem } from '../../types/Cart';
+import * as cartApi from '@/api/cart';
+import { CartItem } from '@/types/Cart';
 
 export const cartQueryKey = (token: string | null) => ['cart', token] as const;
 

@@ -1,6 +1,6 @@
 import { http } from './http';
 import { GetProductsResponse } from './products';
-import { AdminProduct, AdminProductInput } from '../types/AdminProduct';
+import { AdminProduct, AdminProductInput } from '@/types/AdminProduct';
 
 export async function getAdminProducts(): Promise<AdminProduct[]> {
   const data = await http<GetProductsResponse<AdminProduct>>(

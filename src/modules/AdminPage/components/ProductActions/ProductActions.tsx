@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { AdminProduct } from '../../../../types/AdminProduct';
+import { AdminProduct } from '@/types/AdminProduct';
 import styles from './ProductActions.module.scss';
 
 type Props = {

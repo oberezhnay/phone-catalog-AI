@@ -1,8 +1,5 @@
-import {
-  AdminProduct,
-  AdminProductInput,
-} from '../../../../types/AdminProduct';
-import { ProductCategory } from '../../../../types/ProductCategory';
+import { AdminProduct, AdminProductInput } from '@/types/AdminProduct';
+import { ProductCategory } from '@/types/ProductCategory';
 
 export type DescriptionBlockForm = {
   title: string;
