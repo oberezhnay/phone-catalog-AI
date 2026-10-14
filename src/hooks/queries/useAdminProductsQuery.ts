@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getAdminProducts } from '../../api/admin';
+import { getAdminProducts } from '@/api/admin';
 
 export function useAdminProductsQuery() {
   return useQuery({

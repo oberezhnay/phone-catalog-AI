@@ -2,9 +2,9 @@ import React from 'react';
 import style from './BurgerMenu.module.scss';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
-import { menuLinks } from '../../constants/constants';
-import { Logo } from '../Logo';
-import { useAuth } from '../../contexts/AuthContext';
+import { menuLinks } from '@/constants/constants';
+import { Logo } from '@/components/Logo';
+import { useAuth } from '@/contexts/AuthContext';
 
 type Props = {
   isOpen: boolean;

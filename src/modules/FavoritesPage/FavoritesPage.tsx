@@ -1,8 +1,8 @@
-import { Loader } from '../../components/Loader';
-import { useFavorites } from '../../contexts/FavoritesContext';
-import { useProducts } from '../../hooks/useProducts';
-import { ProductsList } from '../CatalogPage/components/ProductsList';
-import { BreadCrumbs } from '../shared/components/BreadCrumbs';
+import { Loader } from '@/components/Loader';
+import { useFavorites } from '@/contexts/FavoritesContext';
+import { useProducts } from '@/hooks/useProducts';
+import { ProductsList } from '@/modules/CatalogPage/components/ProductsList';
+import { BreadCrumbs } from '@/modules/shared/components/BreadCrumbs';
 import styles from './FavoritesPage.module.scss';
 
 export const FavoritesPage = () => {
@@ -17,7 +17,7 @@ export const FavoritesPage = () => {
     return <p>{error}</p>;
   }
 
-  const favouritesProducts = products.filter(product =>
+  const favoritesProducts = products.filter(product =>
     favorites.includes(product.id),
   );
 
@@ -30,9 +30,9 @@ export const FavoritesPage = () => {
       ) : (
         <>
           <h1 className={styles.title}>Favourites</h1>
-          <p className={styles['favourites-qnt']}>{favorites.length} models</p>
+          <p className={styles['favorites-qnt']}>{favorites.length} models</p>
 
-          <ProductsList products={favouritesProducts} />
+          <ProductsList products={favoritesProducts} />
         </>
       )}
     </div>

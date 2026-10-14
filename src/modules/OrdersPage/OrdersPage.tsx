@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Loader } from '../../components/Loader';
-import { BackBtn } from '../shared/components/BackBtn';
-import { useAuth } from '../../contexts/AuthContext';
-import * as ordersApi from '../../api/orders';
-import { Order } from '../../api/orders';
+import { Loader } from '@/components/Loader';
+import { BackBtn } from '@/modules/shared/components/BackBtn';
+import { useAuth } from '@/contexts/AuthContext';
+import * as ordersApi from '@/api/orders';
+import { Order } from '@/api/orders';
 import styles from './OrdersPage.module.scss';
 
 export const OrdersPage = () => {

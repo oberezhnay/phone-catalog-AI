@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import * as authApi from '../api/auth';
-import { User } from '../api/auth';
-import { createRequiredContext } from '../utils/createRequiredContext';
+import * as authApi from '@/api/auth';
+import { User } from '@/api/auth';
+import { createRequiredContext } from '@/utils/createRequiredContext';
 
 const TOKEN_KEY = 'authToken';
 

@@ -1,17 +1,17 @@
 import { NavLink, useParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
-import { Loader } from '../../components/Loader';
-import { BreadCrumbs } from '../shared/components/BreadCrumbs';
-import { BackBtn } from '../shared/components/BackBtn';
+import { Loader } from '@/components/Loader';
+import { BreadCrumbs } from '@/modules/shared/components/BreadCrumbs';
+import { BackBtn } from '@/modules/shared/components/BackBtn';
 import styles from './ProductDetailsPage.module.scss';
-import { ProductsSlider } from '../HomePage/components/ProductsSlider';
-import { useFavorites } from '../../contexts/FavoritesContext';
-import { useCart } from '../../contexts/CartContext';
-import { useRequireAuth } from '../../hooks/useRequireAuth';
-import { useProductDetailsQuery, useProductsQuery } from '../../hooks/queries';
+import { ProductsSlider } from '@/modules/HomePage/components/ProductsSlider';
+import { useFavorites } from '@/contexts/FavoritesContext';
+import { useCart } from '@/contexts/CartContext';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { useProductDetailsQuery, useProductsQuery } from '@/hooks/queries';
 import { ProductReviews } from './components/ProductReviews';
-import { shuffle } from '../../utils/shuffle';
-import { ProductDescription } from '../../types/ProductFull';
+import { shuffle } from '@/utils/shuffle';
+import { ProductDescription } from '@/types/ProductFull';
 
 const SUGGESTED_COUNT = 8;
 

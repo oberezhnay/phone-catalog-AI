@@ -1,12 +1,6 @@
 import { FormEvent, useState } from 'react';
-import {
-  AdminProduct,
-  AdminProductInput,
-} from '../../../../types/AdminProduct';
-import {
-  isProductCategory,
-  PRODUCT_CATEGORIES,
-} from '../../../../types/ProductCategory';
+import { AdminProduct, AdminProductInput } from '@/types/AdminProduct';
+import { isProductCategory, PRODUCT_CATEGORIES } from '@/types/ProductCategory';
 import styles from './ProductForm.module.scss';
 import {
   createEmptyForm,

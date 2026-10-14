@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader } from '../../../components/Loader';
-import { BackBtn } from '../../shared/components/BackBtn';
-import { useAdminProductsQuery } from '../../../hooks/queries';
-import { useAuth } from '../../../contexts/AuthContext';
-import { createAdminProduct, updateAdminProduct } from '../../../api/admin';
-import { ApiError } from '../../../api/http';
-import { AdminProductInput } from '../../../types/AdminProduct';
-import { ProductForm } from '../components/ProductForm';
+import { Loader } from '@/components/Loader';
+import { BackBtn } from '@/modules/shared/components/BackBtn';
+import { useAdminProductsQuery } from '@/hooks/queries';
+import { useAuth } from '@/contexts/AuthContext';
+import { createAdminProduct, updateAdminProduct } from '@/api/admin';
+import { ApiError } from '@/api/http';
+import { AdminProductInput } from '@/types/AdminProduct';
+import { ProductForm } from '@/modules/AdminPage/components/ProductForm';
 import styles from './AdminProductFormPage.module.scss';
 
 export const AdminProductFormPage = () => {

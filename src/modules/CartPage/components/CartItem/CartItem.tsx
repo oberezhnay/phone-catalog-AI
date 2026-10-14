@@ -1,11 +1,11 @@
 import styles from './CartItem.module.scss';
-import { Product } from '../../../../types/Product';
-import { useCart } from '../../../../contexts/CartContext';
+import { Product } from '@/types/Product';
+import { useCart } from '@/contexts/CartContext';
 import { NavLink } from 'react-router-dom';
 
 type Props = {
   product: Product;
-  qty: number | undefined;
+  qty: number;
 };
 
 export const CartItem: React.FC<Props> = ({ product, qty }) => {

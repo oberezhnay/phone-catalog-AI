@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useCatalogCategory } from '../../hooks/useCatalogCategory';
-import { Loader } from '../../components/Loader';
+import { useCatalogCategory } from '@/hooks/useCatalogCategory';
+import { Loader } from '@/components/Loader';
 import { ProductsList } from './components/ProductsList';
-import { useProductsQuery } from '../../hooks/queries/useProductsQuery';
+import { useProductsQuery } from '@/hooks/queries/useProductsQuery';
 import styles from './CatalogPage.module.scss';
-import { ProductCategory } from '../../types/ProductCategory';
-import { Pagination } from '../shared/components/Pagination';
-import { BreadCrumbs } from '../shared/components/BreadCrumbs';
+import { ProductCategory } from '@/types/ProductCategory';
+import { Pagination } from '@/modules/shared/components/Pagination';
+import { BreadCrumbs } from '@/modules/shared/components/BreadCrumbs';
 import { useSearchParams } from 'react-router-dom';
 import { CustomSelect } from './components/Select';
-import { parseOption } from '../../utils/parseOption';
-import { NotFoundPage } from '../NotFoundPage';
+import { parseOption } from '@/utils/parseOption';
+import { NotFoundPage } from '@/modules/NotFoundPage';
 
 const SORT_OPTIONS = ['title', 'price', 'age'] as const;
 const PER_PAGE_OPTIONS = ['4', '8', '16', 'all'] as const;
