@@ -1,4 +1,4 @@
-import { asyncHandler } from '../../utils/asyncHandler.js';
+import { asyncHandler, NoParams } from '../../utils/asyncHandler.js';
 import {
   getFavoritesService,
   addFavoriteService,
@@ -10,15 +10,23 @@ export const getFavorites = asyncHandler(async (req, res) => {
   res.json(await getFavoritesService(req.user!.id));
 });
 
-export const addFavorite = asyncHandler<{}, unknown, AddFavoriteInput, unknown>(
-  async (req, res) => {
-    const favorites = await addFavoriteService(req.user!.id, req.body.productId);
-    res.status(201).json(favorites);
-  },
-);
+export const addFavorite = asyncHandler<
+  NoParams,
+  unknown,
+  AddFavoriteInput,
+  unknown
+>(async (req, res) => {
+  const favorites = await addFavoriteService(req.user!.id, req.body.productId);
+  res.status(201).json(favorites);
+});
 
-export const removeFavorite = asyncHandler<{ productId: string }, unknown, unknown, unknown>(
-  async (req, res) => {
-    res.json(await removeFavoriteService(req.user!.id, Number(req.params.productId)));
-  },
-);
+export const removeFavorite = asyncHandler<
+  { productId: string },
+  unknown,
+  unknown,
+  unknown
+>(async (req, res) => {
+  res.json(
+    await removeFavoriteService(req.user!.id, Number(req.params.productId)),
+  );
+});

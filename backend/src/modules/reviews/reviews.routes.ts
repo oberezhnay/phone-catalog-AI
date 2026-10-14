@@ -11,8 +11,17 @@ import { auth } from '../../middleware/auth.js';
 
 export const reviewsRouter = Router();
 
-reviewsRouter.get('/api/reviews', validate(reviewsQuerySchema, 'query'), getReviews);
-reviewsRouter.post('/api/reviews', auth, validate(upsertReviewSchema), upsertReview);
+reviewsRouter.get(
+  '/api/reviews',
+  validate(reviewsQuerySchema, 'query'),
+  getReviews,
+);
+reviewsRouter.post(
+  '/api/reviews',
+  auth,
+  validate(upsertReviewSchema),
+  upsertReview,
+);
 reviewsRouter.delete(
   '/api/reviews/:id',
   auth,

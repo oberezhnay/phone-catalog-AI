@@ -102,7 +102,7 @@ export const BurgerMenu: React.FC<Props> = ({ isOpen, onClose }) => {
       </ul>
 
       <div className={style.menu__bottom}>
-        <NavLink to="/favourites" className={style.iconFav} onClick={onClose}>
+        <NavLink to="/favorites" className={style.iconFav} onClick={onClose}>
           <img src="/img/icons/Favourites (Heart Like).svg" alt="Favourites" />
         </NavLink>
         <NavLink to="/cart" className={style.iconCart} onClick={onClose}>
