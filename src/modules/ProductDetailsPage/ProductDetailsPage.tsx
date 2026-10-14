@@ -1,5 +1,5 @@
 import { NavLink, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Loader } from '../../components/Loader';
 import { BreadCrumbs } from '../shared/components/BreadCrumbs';
 import { BackBtn } from '../shared/components/BackBtn';
@@ -10,51 +10,80 @@ import { useCart } from '../../contexts/CartContext';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
 import { useProductDetailsQuery, useProductsQuery } from '../../hooks/queries';
 import { ProductReviews } from './components/ProductReviews';
-import { Product } from '../../types/Product';
+import { shuffle } from '../../utils/shuffle';
+import { ProductDescription } from '../../types/ProductFull';
 
-export const ProductDetails = () => {
+const SUGGESTED_COUNT = 8;
+
+// Swatch colors for names that are not valid CSS colors.
+const COLOR_MAP: Record<string, string> = {
+  gold: '#FCDBC1',
+  midnightgreen: '#5F7170',
+  spacegray: '#4C4C4C',
+  silver: '#C0C0C0',
+  rosegold: '#DEA193',
+  graphite: '#251607',
+  sierrablue: '#BFDAF7',
+  starlight: '#F8F9EC',
+};
+
+type Spec = {
+  label: string;
+  value: string | null;
+};
+
+const getShortSpecs = (product: ProductDescription): Spec[] => [
+  { label: 'Screen', value: product.screen },
+  { label: 'Resolution', value: product.resolution },
+  { label: 'Capacity', value: product.capacity },
+  { label: 'RAM', value: product.ram },
+];
+
+const getTechSpecs = (product: ProductDescription): Spec[] => [
+  { label: 'Screen', value: product.screen },
+  { label: 'Resolution', value: product.resolution },
+  { label: 'Processor', value: product.processor },
+  { label: 'RAM', value: product.ram },
+  { label: 'Built in memory', value: product.capacity },
+  { label: 'Camere', value: product.camera },
+  { label: 'Zoom', value: product.zoom },
+  { label: 'Cell', value: product.cell.join(', ') },
+];
+
+const SpecList: React.FC<{ specs: Spec[] }> = ({ specs }) => (
+  <ul className={styles['option-list']}>
+    {specs.map(spec => (
+      <li key={spec.label} className={styles['option-item']}>
+        <p className={styles.option}>{spec.label}</p>
+        <p className={styles.value}>{spec.value}</p>
+      </li>
+    ))}
+  </ul>
+);
+
+export const ProductDetailsPage = () => {
   const { category, productId } = useParams();
   const [activeImg, setActiveImg] = useState<string | undefined>(undefined);
 
-  // Fetch product details
   const { data: product, isLoading } = useProductDetailsQuery(
     category || '',
     productId || '',
   );
 
-  // Fetch all products in category for "you may also like"
+  // All products in the category, for "you may also like"
   const { data: categoryData } = useProductsQuery({
     category: category || undefined,
     perPage: 'all',
   });
 
-  const baseProducts = categoryData?.items || [];
-
   const { cart, toggleCart } = useCart();
   const { favorites, toggleFavorite } = useFavorites();
   const requireAuth = useRequireAuth();
 
-  // Use productId from API response or fallback to numeric id if available
   const productNumericId = product?.productId;
-  const isFavorite = productNumericId
-    ? favorites.includes(productNumericId)
-    : false;
-  const isProductInCart = productNumericId
-    ? cart.find(p => p.id === productNumericId) || 0
-    : false;
-
-  const images = product?.images;
-
-  const colorMap: Record<string, string> = {
-    gold: '#FCDBC1',
-    midnightgreen: '#5F7170',
-    spacegray: '#4C4C4C',
-    silver: '#C0C0C0',
-    rosegold: '#DEA193',
-    graphite: '#251607',
-    sierrablue: '#BFDAF7',
-    starlight: '#F8F9EC',
-  };
+  const isFavorite = !!productNumericId && favorites.includes(productNumericId);
+  const isProductInCart =
+    !!productNumericId && cart.some(item => item.id === productNumericId);
 
   useEffect(() => {
     if (product?.images?.length) {
@@ -62,11 +91,19 @@ export const ProductDetails = () => {
     }
   }, [product?.images]);
 
-  const getSuggestedProducts = (products: Product[]) => {
-    const filtered = products.filter(p => p.id !== productNumericId);
+  // Shuffled once per product, not on every render.
+  const suggestedProducts = useMemo(
+    () =>
+      shuffle(
+        (categoryData?.items ?? []).filter(
+          item => item.id !== productNumericId,
+        ),
+      ).slice(0, SUGGESTED_COUNT),
+    [categoryData?.items, productNumericId],
+  );
 
-    return filtered.sort(() => Math.random() - 0.5).slice(0, 8);
-  };
+  const shortSpecs = product ? getShortSpecs(product) : [];
+  const techSpecs = product ? getTechSpecs(product) : [];
 
   return (
     <div className="container">
@@ -84,7 +121,7 @@ export const ProductDetails = () => {
             <img src={activeImg} className={styles['product-image']} />
 
             <div className={styles['images-block']}>
-              {images?.map(image => (
+              {product.images.map(image => (
                 <img
                   key={image}
                   src={image}
@@ -97,10 +134,10 @@ export const ProductDetails = () => {
 
             <div className={styles['product-characteristics']}>
               <div className={styles.colors}>
-                <p className={styles['top-description']}>
+                <div className={styles['top-description']}>
                   <p className={styles['option-title']}>Available colors</p>
                   <p className={styles.id}>ID: {productNumericId}</p>
-                </p>
+                </div>
 
                 <div className={styles.colorDots}>
                   {product.colorsAvailable.map(color => (
@@ -109,7 +146,7 @@ export const ProductDetails = () => {
                       to={`/${category}/${product.namespaceId}-${product.capacity.toLowerCase()}-${color.toLowerCase()}`}
                       className={`${styles.colorDot} ${color === product.color ? styles.active : ''}`}
                       style={{
-                        background: colorMap[color] || color,
+                        background: COLOR_MAP[color] || color,
                       }}
                     />
                   ))}
@@ -167,84 +204,32 @@ export const ProductDetails = () => {
                 </button>
               </div>
 
-              <ul className={styles['option-list']}>
-                <li className={styles['option-item']}>
-                  <p className={styles.option}>Screen</p>
-                  <p className={styles.value}>{product.screen}</p>
-                </li>
-                <li className={styles['option-item']}>
-                  <p className={styles.option}>Resolution</p>
-                  <p className={styles.value}>{product.resolution}</p>
-                </li>
-                <li className={styles['option-item']}>
-                  <p className={styles.option}>Capacity</p>
-                  <p className={styles.value}>{product.capacity}</p>
-                </li>
-                <li className={styles['option-item']}>
-                  <p className={styles.option}>RAM</p>
-                  <p className={styles.value}>{product.ram}</p>
-                </li>
-              </ul>
+              <SpecList specs={shortSpecs} />
             </div>
           </div>
 
           <div className={styles['product-bottom']}>
             <div className={styles.about}>
               <p className={styles['section-title']}>About</p>
-              {product.description.map(item => (
-                <>
+              {product.description.map((item, index) => (
+                <div key={`${item.title}-${index}`}>
                   <p className={styles.title}>{item.title}</p>
                   <p className={styles.text}>{item.text}</p>
-                </>
+                </div>
               ))}
             </div>
 
             <div className={styles['tech-speck']}>
               <p className={styles['section-title']}>Tech specs</p>
-              <ul className={styles['option-list']}>
-                <li className={styles['option-item']}>
-                  <p className={styles.option}>Screen</p>
-                  <p className={styles.value}>{product.screen}</p>
-                </li>
-                <li className={styles['option-item']}>
-                  <p className={styles.option}>Resolution</p>
-                  <p className={styles.value}>{product.resolution}</p>
-                </li>
-                <li className={styles['option-item']}>
-                  <p className={styles.option}>Processor</p>
-                  <p className={styles.value}>{product.processor}</p>
-                </li>
-                <li className={styles['option-item']}>
-                  <p className={styles.option}>RAM</p>
-                  <p className={styles.value}>{product.ram}</p>
-                </li>
-                <li className={styles['option-item']}>
-                  <p className={styles.option}>Built in memory</p>
-                  <p className={styles.value}>{product.capacity}</p>
-                </li>
-                <li className={styles['option-item']}>
-                  <p className={styles.option}>Camere</p>
-                  <p className={styles.value}>{product.camera}</p>
-                </li>
-                <li className={styles['option-item']}>
-                  <p className={styles.option}>Zoom</p>
-                  <p className={styles.value}>{product.zoom}</p>
-                </li>
-                <li className={styles['option-item']}>
-                  <p className={styles.option}>Cell</p>
-                  <p className={styles.value}>{product.cell}</p>
-                </li>
-              </ul>
+              <SpecList specs={techSpecs} />
             </div>
           </div>
 
-          {productNumericId && (
-            <ProductReviews productId={Number(productNumericId)} />
-          )}
+          {productNumericId && <ProductReviews productId={productNumericId} />}
 
           <div className={styles['may-like']}>
             <ProductsSlider
-              products={getSuggestedProducts(baseProducts)}
+              products={suggestedProducts}
               title="You may also like"
             />
           </div>
