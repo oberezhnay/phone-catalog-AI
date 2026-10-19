@@ -9,11 +9,20 @@ function getPrismaCode(err: unknown): string | undefined {
   return undefined;
 }
 
-export function notFoundHandler(_req: Request, _res: Response, next: NextFunction): void {
+export function notFoundHandler(
+  _req: Request,
+  _res: Response,
+  next: NextFunction,
+): void {
   next(ApiError.notFound('Route not found'));
 }
 
-export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction): void {
+export function errorHandler(
+  err: unknown,
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+): void {
   if (err instanceof ApiError) {
     res.status(err.statusCode).json({
       error: err.message,
@@ -32,11 +41,15 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
 
   switch (getPrismaCode(err)) {
     case 'P2002':
-      res.status(409).json({ error: 'Resource already exists', code: 'DUPLICATE' });
+      res
+        .status(409)
+        .json({ error: 'Resource already exists', code: 'DUPLICATE' });
       return;
     case 'P2003':
       // Foreign key failure: a referenced row (e.g. productId) does not exist
-      res.status(404).json({ error: 'Related resource not found', code: 'NOT_FOUND' });
+      res
+        .status(404)
+        .json({ error: 'Related resource not found', code: 'NOT_FOUND' });
       return;
     case 'P2025':
       res.status(404).json({ error: 'Resource not found', code: 'NOT_FOUND' });

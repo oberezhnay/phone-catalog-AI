@@ -14,6 +14,12 @@ module.exports = {
   ],
   overrides: [
     {
+      'files': ['src/test/**'],
+      'rules': {
+        'import/no-extraneous-dependencies': ['off'],
+      }
+    },
+    {
       'files': ['**/*.spec.jsx'],
       'rules': {
         'react/jsx-filename-extension': ['off'],

@@ -6,7 +6,9 @@ import {
   upsertReviewService,
 } from './reviews.service.js';
 
-const review = (overrides: Partial<{ id: number; userId: number; rating: number }> = {}) => ({
+const review = (
+  overrides: Partial<{ id: number; userId: number; rating: number }> = {},
+) => ({
   id: 1,
   productId: 1,
   userId: 1,
@@ -47,15 +49,19 @@ describe('reviews.service', () => {
     it('throws notFound when the product does not exist', async () => {
       prismaMock.product.findUnique.mockResolvedValue(null);
 
-      await expect(upsertReviewService(1, 1, 5, 'great')).rejects.toMatchObject({
-        statusCode: 404,
-      });
+      await expect(upsertReviewService(1, 1, 5, 'great')).rejects.toMatchObject(
+        {
+          statusCode: 404,
+        },
+      );
       expect(prismaMock.review.upsert).not.toHaveBeenCalled();
     });
 
     it('upserts on the (productId, userId) unique pair so a second review updates, not duplicates', async () => {
       prismaMock.product.findUnique.mockResolvedValue({ id: 1 } as never);
-      prismaMock.review.upsert.mockResolvedValue(review({ rating: 2 }) as never);
+      prismaMock.review.upsert.mockResolvedValue(
+        review({ rating: 2 }) as never,
+      );
 
       await upsertReviewService(1, 1, 2, 'actually just okay');
 
@@ -63,7 +69,12 @@ describe('reviews.service', () => {
         expect.objectContaining({
           where: { productId_userId: { productId: 1, userId: 1 } },
           update: { rating: 2, comment: 'actually just okay' },
-          create: { productId: 1, userId: 1, rating: 2, comment: 'actually just okay' },
+          create: {
+            productId: 1,
+            userId: 1,
+            rating: 2,
+            comment: 'actually just okay',
+          },
         }),
       );
     });
@@ -73,23 +84,33 @@ describe('reviews.service', () => {
     it('throws notFound when the review does not exist', async () => {
       prismaMock.review.findUnique.mockResolvedValue(null);
 
-      await expect(deleteReviewService(1, 99)).rejects.toMatchObject({ statusCode: 404 });
+      await expect(deleteReviewService(1, 99)).rejects.toMatchObject({
+        statusCode: 404,
+      });
       expect(prismaMock.review.delete).not.toHaveBeenCalled();
     });
 
-    it("throws notFound when the review belongs to someone else (never leaks 403 ownership info)", async () => {
-      prismaMock.review.findUnique.mockResolvedValue(review({ userId: 2 }) as never);
+    it('throws notFound when the review belongs to someone else (never leaks 403 ownership info)', async () => {
+      prismaMock.review.findUnique.mockResolvedValue(
+        review({ userId: 2 }) as never,
+      );
 
-      await expect(deleteReviewService(1, 1)).rejects.toMatchObject({ statusCode: 404 });
+      await expect(deleteReviewService(1, 1)).rejects.toMatchObject({
+        statusCode: 404,
+      });
       expect(prismaMock.review.delete).not.toHaveBeenCalled();
     });
 
     it('deletes the review when it belongs to the requesting user', async () => {
-      prismaMock.review.findUnique.mockResolvedValue(review({ userId: 1 }) as never);
+      prismaMock.review.findUnique.mockResolvedValue(
+        review({ userId: 1 }) as never,
+      );
 
       await deleteReviewService(1, 1);
 
-      expect(prismaMock.review.delete).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(prismaMock.review.delete).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
     });
   });
 });

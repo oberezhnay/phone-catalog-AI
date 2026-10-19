@@ -6,7 +6,9 @@ import {
   getOrdersService,
 } from './orders.service.js';
 
-const product = (overrides: Partial<{ id: number; priceDiscount: number }> = {}) => ({
+const product = (
+  overrides: Partial<{ id: number; priceDiscount: number }> = {},
+) => ({
   id: 1,
   itemId: 'phone-1',
   namespaceId: 'phone',
@@ -40,7 +42,7 @@ describe('orders.service', () => {
     // createOrderService runs its writes inside $transaction(tx => ...);
     // re-using prismaMock as `tx` lets the same mocked methods be asserted on.
     prismaMock.$transaction.mockImplementation((callback: unknown) =>
-      (callback as (tx: typeof prismaMock) => unknown)(prismaMock),
+      (callback as (tx: typeof prismaMock) => Promise<unknown>)(prismaMock),
     );
   });
 
@@ -48,7 +50,9 @@ describe('orders.service', () => {
     it('rejects when the cart does not exist', async () => {
       prismaMock.cart.findUnique.mockResolvedValue(null);
 
-      await expect(createOrderService(1)).rejects.toMatchObject({ statusCode: 400 });
+      await expect(createOrderService(1)).rejects.toMatchObject({
+        statusCode: 400,
+      });
     });
 
     it('rejects when the cart is empty', async () => {
@@ -59,7 +63,9 @@ describe('orders.service', () => {
         items: [],
       } as never);
 
-      await expect(createOrderService(1)).rejects.toMatchObject({ statusCode: 400 });
+      await expect(createOrderService(1)).rejects.toMatchObject({
+        statusCode: 400,
+      });
     });
 
     it('computes the total from priceDiscount * quantity and snapshots it on each line', async () => {
@@ -68,8 +74,20 @@ describe('orders.service', () => {
         userId: 1,
         updatedAt: new Date(),
         items: [
-          { id: 1, cartId: 10, productId: 1, quantity: 2, product: product({ priceDiscount: 400 }) },
-          { id: 2, cartId: 10, productId: 2, quantity: 1, product: product({ id: 2, priceDiscount: 100 }) },
+          {
+            id: 1,
+            cartId: 10,
+            productId: 1,
+            quantity: 2,
+            product: product({ priceDiscount: 400 }),
+          },
+          {
+            id: 2,
+            cartId: 10,
+            productId: 2,
+            quantity: 1,
+            product: product({ id: 2, priceDiscount: 100 }),
+          },
         ],
       } as never);
 
@@ -80,8 +98,22 @@ describe('orders.service', () => {
         total: 900,
         createdAt: new Date(),
         items: [
-          { id: 1, orderId: 99, productId: 1, quantity: 2, priceAtPurchase: 400, product: product({ priceDiscount: 400 }) },
-          { id: 2, orderId: 99, productId: 2, quantity: 1, priceAtPurchase: 100, product: product({ id: 2, priceDiscount: 100 }) },
+          {
+            id: 1,
+            orderId: 99,
+            productId: 1,
+            quantity: 2,
+            priceAtPurchase: 400,
+            product: product({ priceDiscount: 400 }),
+          },
+          {
+            id: 2,
+            orderId: 99,
+            productId: 2,
+            quantity: 1,
+            priceAtPurchase: 100,
+            product: product({ id: 2, priceDiscount: 100 }),
+          },
         ],
       } as never);
 
@@ -113,7 +145,14 @@ describe('orders.service', () => {
           total: 400,
           createdAt: new Date(),
           items: [
-            { id: 1, orderId: 1, productId: 1, quantity: 1, priceAtPurchase: 400, product: product() },
+            {
+              id: 1,
+              orderId: 1,
+              productId: 1,
+              quantity: 1,
+              priceAtPurchase: 400,
+              product: product(),
+            },
           ],
         },
       ] as never);
@@ -135,7 +174,9 @@ describe('orders.service', () => {
     it('throws notFound when the order does not belong to the user (or does not exist)', async () => {
       prismaMock.order.findFirst.mockResolvedValue(null);
 
-      await expect(getOrderService(1, 42)).rejects.toMatchObject({ statusCode: 404 });
+      await expect(getOrderService(1, 42)).rejects.toMatchObject({
+        statusCode: 404,
+      });
     });
 
     it('returns the serialized order when it belongs to the user', async () => {
@@ -146,7 +187,14 @@ describe('orders.service', () => {
         total: 400,
         createdAt: new Date(),
         items: [
-          { id: 1, orderId: 42, productId: 1, quantity: 1, priceAtPurchase: 400, product: product() },
+          {
+            id: 1,
+            orderId: 42,
+            productId: 1,
+            quantity: 1,
+            priceAtPurchase: 400,
+            product: product(),
+          },
         ],
       } as never);
 

@@ -60,7 +60,8 @@
       white-space: nowrap;
 
       @include on-tablet {
-        display: block;
+        display: flex;
+        align-items: center;
       }
     }
 

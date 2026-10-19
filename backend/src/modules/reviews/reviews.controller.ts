@@ -1,4 +1,4 @@
-import { asyncHandler } from '../../utils/asyncHandler.js';
+import { asyncHandler, NoParams } from '../../utils/asyncHandler.js';
 import {
   getProductReviewsService,
   upsertReviewService,
@@ -12,18 +12,29 @@ export const getReviews = asyncHandler(async (req, res) => {
   res.json(await getProductReviewsService(productId));
 });
 
-export const upsertReview = asyncHandler<{}, unknown, UpsertReviewInput, unknown>(
-  async (req, res) => {
-    const { productId, rating, comment } = req.body;
-    const review = await upsertReviewService(req.user!.id, productId, rating, comment);
+export const upsertReview = asyncHandler<
+  NoParams,
+  unknown,
+  UpsertReviewInput,
+  unknown
+>(async (req, res) => {
+  const { productId, rating, comment } = req.body;
+  const review = await upsertReviewService(
+    req.user!.id,
+    productId,
+    rating,
+    comment,
+  );
 
-    res.status(201).json(review);
-  },
-);
+  res.status(201).json(review);
+});
 
-export const deleteReview = asyncHandler<{ id: string }, unknown, unknown, unknown>(
-  async (req, res) => {
-    await deleteReviewService(req.user!.id, Number(req.params.id));
-    res.status(204).send();
-  },
-);
+export const deleteReview = asyncHandler<
+  { id: string },
+  unknown,
+  unknown,
+  unknown
+>(async (req, res) => {
+  await deleteReviewService(req.user!.id, Number(req.params.id));
+  res.status(204).send();
+});

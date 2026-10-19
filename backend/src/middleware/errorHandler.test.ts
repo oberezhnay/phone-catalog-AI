@@ -38,7 +38,9 @@ describe('errorHandler', () => {
     const res = run({ code: 'P2002' });
 
     expect(res.status).toHaveBeenCalledWith(409);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'DUPLICATE' }));
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 'DUPLICATE' }),
+    );
   });
 
   it('maps Prisma P2003 (missing referenced row) to 404', () => {
@@ -54,7 +56,9 @@ describe('errorHandler', () => {
   });
 
   it('answers malformed JSON bodies with 400', () => {
-    const syntaxError = Object.assign(new SyntaxError('Unexpected token'), { status: 400 });
+    const syntaxError = Object.assign(new SyntaxError('Unexpected token'), {
+      status: 400,
+    });
     const res = run(syntaxError);
 
     expect(res.status).toHaveBeenCalledWith(400);

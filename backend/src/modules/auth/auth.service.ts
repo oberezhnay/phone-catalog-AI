@@ -4,7 +4,12 @@ import { signToken } from '../../utils/jwt.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { RegisterInput, LoginInput } from './auth.schema.js';
 
-function toPublicUser(user: { id: number; email: string; name: string; role: string }) {
+function toPublicUser(user: {
+  id: number;
+  email: string;
+  name: string;
+  role: string;
+}) {
   return {
     id: user.id,
     email: user.email,
@@ -14,7 +19,9 @@ function toPublicUser(user: { id: number; email: string; name: string; role: str
 }
 
 export async function registerService(data: RegisterInput) {
-  const existing = await prisma.user.findUnique({ where: { email: data.email } });
+  const existing = await prisma.user.findUnique({
+    where: { email: data.email },
+  });
 
   if (existing) {
     throw ApiError.conflict('User with this email already exists');

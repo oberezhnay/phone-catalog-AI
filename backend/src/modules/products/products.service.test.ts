@@ -62,7 +62,11 @@ describe('products.service', () => {
       prismaMock.product.count.mockResolvedValue(0);
       prismaMock.product.findMany.mockResolvedValue([]);
 
-      await getProductsService({ category: 'tablets', page: 1, perPage: 'all' });
+      await getProductsService({
+        category: 'tablets',
+        page: 1,
+        perPage: 'all',
+      });
 
       expect(prismaMock.product.count).toHaveBeenCalledWith({
         where: { category: 'tablets' },
@@ -89,16 +93,19 @@ describe('products.service', () => {
       ['title', { name: 'asc' }],
       ['price', { priceDiscount: 'asc' }],
       ['age', { year: 'desc' }],
-    ] as const)('sorts by %s using the matching column', async (sort, expectedOrderBy) => {
-      prismaMock.product.count.mockResolvedValue(0);
-      prismaMock.product.findMany.mockResolvedValue([]);
+    ] as const)(
+      'sorts by %s using the matching column',
+      async (sort, expectedOrderBy) => {
+        prismaMock.product.count.mockResolvedValue(0);
+        prismaMock.product.findMany.mockResolvedValue([]);
 
-      await getProductsService({ sort, page: 1, perPage: 'all' });
+        await getProductsService({ sort, page: 1, perPage: 'all' });
 
-      expect(prismaMock.product.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({ orderBy: expectedOrderBy }),
-      );
-    });
+        expect(prismaMock.product.findMany).toHaveBeenCalledWith(
+          expect.objectContaining({ orderBy: expectedOrderBy }),
+        );
+      },
+    );
 
     it('paginates with skip/take derived from page and perPage', async () => {
       prismaMock.product.count.mockResolvedValue(50);
@@ -127,11 +134,15 @@ describe('products.service', () => {
     it('returns null when no product matches the category/itemId pair', async () => {
       prismaMock.product.findFirst.mockResolvedValue(null);
 
-      await expect(getProductDetailService('phones', 'missing')).resolves.toBeNull();
+      await expect(
+        getProductDetailService('phones', 'missing'),
+      ).resolves.toBeNull();
     });
 
     it('adds a numeric productId field alongside the existing id', async () => {
-      prismaMock.product.findFirst.mockResolvedValue(product({ id: 7 }) as never);
+      prismaMock.product.findFirst.mockResolvedValue(
+        product({ id: 7 }) as never,
+      );
 
       const result = await getProductDetailService('phones', 'phone-1');
 
@@ -153,13 +164,18 @@ describe('products.service', () => {
       const failure = new Error('connection lost');
       prismaMock.product.create.mockRejectedValue(failure);
 
-      await expect(createProductService({ itemId: 'phone-1' } as never)).rejects.toBe(failure);
+      await expect(
+        createProductService({ itemId: 'phone-1' } as never),
+      ).rejects.toBe(failure);
     });
 
     it('creates the product and does not pre-check itemId', async () => {
       prismaMock.product.create.mockResolvedValue(product() as never);
 
-      await createProductService({ itemId: 'phone-1', category: 'phones' } as never);
+      await createProductService({
+        itemId: 'phone-1',
+        category: 'phones',
+      } as never);
 
       expect(prismaMock.product.findUnique).not.toHaveBeenCalled();
       expect(prismaMock.product.create).toHaveBeenCalled();
@@ -193,7 +209,9 @@ describe('products.service', () => {
 
       await deleteProductService(1);
 
-      expect(prismaMock.product.delete).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(prismaMock.product.delete).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
     });
   });
 });

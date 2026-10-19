@@ -8,4 +8,9 @@ export const ordersRouter = Router();
 
 ordersRouter.post('/api/orders', auth, createOrder);
 ordersRouter.get('/api/orders', auth, getOrders);
-ordersRouter.get('/api/orders/:id', auth, validate(idParamsSchema, 'params'), getOrder);
+ordersRouter.get(
+  '/api/orders/:id',
+  auth,
+  validate(idParamsSchema, 'params'),
+  getOrder,
+);

@@ -4,7 +4,7 @@ import React from 'react';
 import { ProductCategory } from '@/types/ProductCategory';
 
 type Props = {
-  category: ProductCategory | 'Favourites';
+  category: ProductCategory | 'Favorites';
   itemName?: string;
 };
 
@@ -22,7 +22,7 @@ export const BreadCrumbs: React.FC<Props> = ({ category, itemName }) => {
         src="/img/icons/ChevronArrowRight.svg"
         alt="icon"
       />
-      <NavLink to={`/${category}`} className={styles['breadcrumbs-category']}>
+      <NavLink to={`/${category.toLowerCase()}`} className={styles['breadcrumbs-category']}>
         {categoryName}
       </NavLink>
       {itemName && (

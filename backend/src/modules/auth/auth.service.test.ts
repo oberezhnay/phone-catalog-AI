@@ -103,7 +103,9 @@ describe('auth.service', () => {
     it('throws notFound when the user no longer exists', async () => {
       prismaMock.user.findUnique.mockResolvedValue(null);
 
-      await expect(getMeService(999)).rejects.toMatchObject({ statusCode: 404 });
+      await expect(getMeService(999)).rejects.toMatchObject({
+        statusCode: 404,
+      });
     });
 
     it('surfaces an ApiError instance, not just a matching shape', async () => {

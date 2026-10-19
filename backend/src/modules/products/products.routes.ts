@@ -20,7 +20,11 @@ import { requireAdmin } from '../../middleware/requireRole.js';
 export const productsRouter = Router();
 
 // Public routes
-productsRouter.get('/api/products', validate(getProductsQuerySchema, 'query'), getProducts);
+productsRouter.get(
+  '/api/products',
+  validate(getProductsQuerySchema, 'query'),
+  getProducts,
+);
 productsRouter.get(
   '/api/products/:category/:itemId',
   validate(productDetailParamsSchema, 'params'),

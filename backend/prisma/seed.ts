@@ -82,7 +82,7 @@ async function seed() {
         const detailJson = fs.readFileSync(detailPath, 'utf-8');
         const details: ProductDetail[] = JSON.parse(detailJson);
 
-        details.forEach((detail) => {
+        details.forEach(detail => {
           detailMap.set(detail.id, detail);
         });
 
@@ -108,7 +108,9 @@ async function seed() {
           id: listItem.id,
           itemId: listItem.itemId,
           namespaceId: detail.namespaceId,
-          category: (listItem.category as ProductCategory).toLowerCase() as ProductCategory,
+          category: (
+            listItem.category as ProductCategory
+          ).toLowerCase() as ProductCategory,
           name: detail.name,
           capacity: detail.capacity,
           capacityAvailable: detail.capacityAvailable,
