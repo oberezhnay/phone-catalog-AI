@@ -23,7 +23,7 @@ export const FavoritesPage = () => {
 
   return (
     <div className="container">
-      <BreadCrumbs category="Favourites" />
+      <BreadCrumbs category="Favorites" />
 
       {favorites.length === 0 ? (
         <h1>{`Your Favourites list is empty`}</h1>
