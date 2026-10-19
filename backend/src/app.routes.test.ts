@@ -198,3 +198,85 @@ describe('cart and favorites routes', () => {
     expect(res.status).toBe(400);
   });
 });
+
+describe('admin orders routes', () => {
+  it('requires a token', async () => {
+    const res = await request(app).get('/api/admin/orders');
+
+    expect(res.status).toBe(401);
+  });
+
+  it('forbids a non-admin', async () => {
+    const list = await request(app)
+      .get('/api/admin/orders')
+      .set(bearer(userToken));
+    const patch = await request(app)
+      .patch('/api/admin/orders/1/status')
+      .set(bearer(userToken))
+      .send({ status: 'paid' });
+
+    expect(list.status).toBe(403);
+    expect(patch.status).toBe(403);
+    expect(prismaMock.order.update).not.toHaveBeenCalled();
+  });
+
+  it('lists orders for an admin and rejects an unknown status filter', async () => {
+    prismaMock.order.findMany.mockResolvedValue([]);
+
+    const ok = await request(app)
+      .get('/api/admin/orders?status=shipped')
+      .set(bearer(adminToken));
+    const bad = await request(app)
+      .get('/api/admin/orders?status=bogus')
+      .set(bearer(adminToken));
+
+    expect(ok.status).toBe(200);
+    expect(bad.status).toBe(400);
+  });
+
+  it('validates the status body and the id', async () => {
+    const badStatus = await request(app)
+      .patch('/api/admin/orders/1/status')
+      .set(bearer(adminToken))
+      .send({ status: 'bogus' });
+    const badId = await request(app)
+      .patch('/api/admin/orders/abc/status')
+      .set(bearer(adminToken))
+      .send({ status: 'paid' });
+
+    expect(badStatus.status).toBe(400);
+    expect(badId.status).toBe(400);
+    expect(prismaMock.order.update).not.toHaveBeenCalled();
+  });
+
+  it('updates the status for an admin', async () => {
+    prismaMock.order.update.mockResolvedValue({
+      id: 1,
+      userId: 3,
+      status: 'paid',
+      total: 100,
+      createdAt: new Date(),
+      items: [],
+      user: { id: 3, email: 'u@test.com', name: 'U' },
+    } as never);
+
+    const res = await request(app)
+      .patch('/api/admin/orders/1/status')
+      .set(bearer(adminToken))
+      .send({ status: 'paid' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('paid');
+  });
+
+  it('returns 404 when the order does not exist', async () => {
+    prismaMock.order.update.mockRejectedValue({ code: 'P2025' });
+
+    const res = await request(app)
+      .patch('/api/admin/orders/999/status')
+      .set(bearer(adminToken))
+      .send({ status: 'paid' });
+
+    expect(res.status).toBe(404);
+  });
+});
