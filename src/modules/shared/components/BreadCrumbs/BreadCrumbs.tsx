@@ -22,7 +22,10 @@ export const BreadCrumbs: React.FC<Props> = ({ category, itemName }) => {
         src="/img/icons/ChevronArrowRight.svg"
         alt="icon"
       />
-      <NavLink to={`/${category.toLowerCase()}`} className={styles['breadcrumbs-category']}>
+      <NavLink
+        to={`/${category.toLowerCase()}`}
+        className={styles['breadcrumbs-category']}
+      >
         {categoryName}
       </NavLink>
       {itemName && (
