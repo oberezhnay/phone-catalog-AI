@@ -1,6 +1,6 @@
 import { prisma } from '../../lib/prisma.js';
 import { ApiError } from '../../utils/ApiError.js';
-import { Order, OrderItem, Product } from '@prisma/client';
+import { Order, OrderItem, OrderStatus, Product } from '@prisma/client';
 
 type OrderWithItems = Order & {
   items: (OrderItem & { product: Product })[];
@@ -73,9 +73,14 @@ export async function getOrdersService(userId: number) {
   return orders.map(serializeOrder);
 }
 
-export async function getOrderService(userId: number, orderId: number) {
+// A regular user only sees their own orders; an admin sees any order.
+export async function getOrderService(
+  userId: number,
+  orderId: number,
+  isAdmin = false,
+) {
   const order = await prisma.order.findFirst({
-    where: { id: orderId, userId },
+    where: isAdmin ? { id: orderId } : { id: orderId, userId },
     include: orderInclude,
   });
 
@@ -84,4 +89,33 @@ export async function getOrderService(userId: number, orderId: number) {
   }
 
   return serializeOrder(order);
+}
+
+const adminOrderInclude = {
+  ...orderInclude,
+  user: { select: { id: true, email: true, name: true } },
+} as const;
+
+export async function getAdminOrdersService(status?: OrderStatus) {
+  const orders = await prisma.order.findMany({
+    where: status ? { status } : undefined,
+    include: adminOrderInclude,
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return orders.map(order => ({ ...serializeOrder(order), user: order.user }));
+}
+
+export async function updateOrderStatusService(
+  orderId: number,
+  status: OrderStatus,
+) {
+  // A missing order surfaces as Prisma P2025, which errorHandler maps to 404.
+  const order = await prisma.order.update({
+    where: { id: orderId },
+    data: { status },
+    include: adminOrderInclude,
+  });
+
+  return { ...serializeOrder(order), user: order.user };
 }
