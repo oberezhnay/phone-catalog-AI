@@ -9,6 +9,7 @@ import { LoginPage } from './modules/LoginPage';
 import { RegisterPage } from './modules/RegisterPage';
 import { OrdersPage } from './modules/OrdersPage';
 import { AdminPage } from './modules/AdminPage';
+import { AdminOrdersPage } from './modules/AdminOrdersPage';
 import { AdminProductFormPage } from './modules/AdminPage/AdminProductFormPage';
 import { NotFoundPage } from './modules/NotFoundPage';
 import { ProtectedRoute } from './modules/shared/components/ProtectedRoute';
@@ -36,6 +37,7 @@ export const AppRoutes = () => (
         }
       />
       <Route path="admin" element={forAdmin(<AdminPage />)} />
+      <Route path="admin/orders" element={forAdmin(<AdminOrdersPage />)} />
       <Route
         path="admin/products/new"
         element={forAdmin(<AdminProductFormPage />)}

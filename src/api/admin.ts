@@ -1,6 +1,7 @@
 import { http } from './http';
 import { GetProductsResponse } from './products';
 import { AdminProduct, AdminProductInput } from '@/types/AdminProduct';
+import { Order, OrderStatus } from './orders';
 
 export async function getAdminProducts(): Promise<AdminProduct[]> {
   const data = await http<GetProductsResponse<AdminProduct>>(
@@ -40,5 +41,30 @@ export async function deleteAdminProduct(
   return http<void>(`/products/${id}`, {
     method: 'DELETE',
     token,
+  });
+}
+
+export type AdminOrder = Order & {
+  user: { id: number; email: string; name: string };
+};
+
+export async function getAdminOrders(
+  token: string,
+  status?: OrderStatus,
+): Promise<AdminOrder[]> {
+  const query = status ? `?status=${status}` : '';
+
+  return http<AdminOrder[]>(`/admin/orders${query}`, { token });
+}
+
+export async function updateAdminOrderStatus(
+  token: string,
+  id: number,
+  status: OrderStatus,
+): Promise<AdminOrder> {
+  return http<AdminOrder>(`/admin/orders/${id}/status`, {
+    method: 'PATCH',
+    token,
+    body: JSON.stringify({ status }),
   });
 }
