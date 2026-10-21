@@ -39,3 +39,11 @@ export async function createOrder(token: string): Promise<Order> {
 export async function getOrders(token: string): Promise<Order[]> {
   return http<Order[]>('/orders', { token });
 }
+
+export const ORDER_STATUSES: OrderStatus[] = [
+  'pending',
+  'paid',
+  'shipped',
+  'delivered',
+  'cancelled',
+];

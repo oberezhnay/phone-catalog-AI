@@ -1,0 +1,16 @@
+@use '@/styles/tokens' as *;
+
+.select {
+  height: 36px;
+  padding: 0 8px;
+  border: 1px solid $elements;
+  background-color: $white;
+  font-size: 14px;
+  text-transform: capitalize;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+}

@@ -53,9 +53,14 @@ export const AdminPage = () => {
     <div className="container">
       <div className={styles.header}>
         <h1 className={styles.title}>Admin · Products</h1>
-        <NavLink to="/admin/products/new" className={styles['add-button']}>
-          + Add product
-        </NavLink>
+        <div className={styles.actions}>
+          <NavLink to="/admin/orders" className={styles['add-button']}>
+            Orders
+          </NavLink>
+          <NavLink to="/admin/products/new" className={styles['add-button']}>
+            + Add product
+          </NavLink>
+        </div>
       </div>
 
       {/* Mobile: card list (below tablet breakpoint) */}
