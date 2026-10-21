@@ -3,3 +3,4 @@ export * from './useProductsQuery';
 export * from './useAdminProductsQuery';
 export * from './useCartQuery';
 export * from './useFavoritesQuery';
+export * from './useAdminOrdersQuery';
