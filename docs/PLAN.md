@@ -1,186 +1,96 @@
-# Plan: Make phone-catalog-AI Full-Stack
+# phone-catalog-AI: full-stack plan and current state
 
-## Context
+Last updated: 2026-10-22. This file describes the project **as it is now** (phases 0–6 built, phase 7 deployment pending) and keeps the decisions that shaped it. The source of truth for details is the code: `backend/prisma/schema.prisma`, `backend/src/modules/*`, `src/AppRoutes.tsx`.
 
-`phone-catalog-AI` is currently a pure static-JSON-driven React SPA (Mate Academy Vite starter): it fetches `public/api/*.json` with raw `fetch()`, stores cart/favorites in `localStorage` via React Context, and has zero backend, auth, or persistence beyond the browser. The goal is to turn it into a real full-stack e-commerce app — PostgreSQL (via Neon) for data, a Node/Express/TypeScript REST API with JWT auth and `user`/`admin` roles, an admin panel for product CRUD, and a React/TanStack Query frontend — deployed to Vercel (frontend) + Railway/Render (backend) + Neon (DB).
+## Status
 
-Decisions locked in with the user before this plan:
-- **Monorepo**: add `backend/` as an npm-workspace sibling; frontend stays at root (avoids churning existing Vite/ESLint/Cypress config for one frontend package).
-- **ORM**: Prisma.
-- **Guest cart/favorites**: ~~stay localStorage-only for anonymous users (unchanged UX); merge into the server on login/register.~~ **Revised mid-Phase-3, decided with the user:** no guest cart at all. Cart/favorites are available only to authenticated users; `localCart.ts`/`localFavorites.ts` were deleted outright rather than kept as a guest-branch fallback. Attempting to add to cart/favorites while logged out redirects to `/login` (via a new `useRequireAuth` hook) instead of operating on local state. Cart/favorites API routes are 100% auth-required — no guest-cart backend endpoints, and no merge-on-login flow (there's nothing to merge).
-- **Favorites**: also gets a DB table + merge-on-login, same pattern as cart, even though not in the original table list.
+| Phase | State |
+|---|---|
+| 0. Backend scaffold | Done |
+| 1. Products read API + TanStack Query + `BrowserRouter` | Done |
+| 2. Auth (JWT, `user`/`admin`) | Done |
+| 3. Cart and favorites, auth-only | Done |
+| 4. Orders / checkout | Done |
+| 5. Reviews | Done |
+| 6. Admin panel: product CRUD, order management | Done |
+| Refactoring (6 stages), tests, lint | Done |
+| 7. Cloud deployment (Neon + Railway/Render + Vercel) | **Not started** |
 
-## Key existing code to build around (do not rename/break these shapes)
+### Remaining work (phase 7)
 
-- `src/types/Product.ts` (list/card shape) and `src/types/ProductFull.ts` (`ProductDescription`, detail shape) — field names are the API contract; the backend maps into these, not the other way around.
-- `src/contexts/CartContext.tsx` / `src/contexts/FavoritesContext.tsx` — Context API returning `{ cart, toggleCart, removeFromCart, increase, decrease, clearCart }` / `{ favorites, toggleFavorite }`. Every consumer (`ProductCard`, `Header`, `CartPage`, `FavoritesPage`, `ProductDetails.tsx`) only uses this shape, so it stayed stable while the internals switched from pure-localStorage to a server-only API (see Phase 3 note below — the originally planned local/server hybrid was dropped in favor of auth-only).
-- `src/api/localCart.ts` / `src/api/localFavorites.ts` — ~~existing localStorage read/write helpers, reused for the guest branch and for reading data to merge on login~~. **Deleted in Phase 3** — guest cart/favorites were dropped, so these had no remaining purpose.
-- `src/modules/Catalog/CatalogPage.tsx` — owns the URL-param contract (`sort` ∈ `title|price|age`, `perPage` ∈ `4|8|16|all`, `page`) and expects `Pagination`'s `total` prop to be a total item count. The new products API must satisfy this contract so this component barely changes.
-- `src/modules/ProductDetailsPage/ProductDetails.tsx` — today does `Promise.all([getProducts(), getProductsDetails(category)])` and cross-matches by `itemId` purely because the two static datasets were never merged; once the backend returns one unified row per SKU, this collapses to a single query.
-- `vite.config.ts` — `base: '/phone-catalog-react-ts/'` (GitHub Pages) and `@` → `src` alias.
-- Root `.gitignore` does **not** currently ignore `.env` — must fix before adding secrets.
+Repo prep (no accounts needed):
+- [ ] Confirm a clean checkout builds and starts: root `npm ci && npm run build`; `cd backend && npm ci && npx prisma generate && npm run build && npm start`. Make sure the backend build does not rely on dev-only tooling a host would prune.
+- [ ] Add a deploy section to `README.md`. The README on `main` is outdated: it still describes the GitHub Pages demo. A rewrite exists on the local branch `docs/update-readme`.
+- [ ] Optional, not in the original plan: CI (`lint`, `typecheck`, `test` for both packages). There is no `.github/` yet.
+- [ ] Optional cleanup: `cypress` and `eslint-plugin-cypress` are still in `package.json`, but there are no Cypress tests.
 
-## 1. Monorepo layout
+Needs the owner (accounts and secrets):
+- [ ] Neon: create a project, copy the pooled `DATABASE_URL` and the direct `DIRECT_URL`.
+- [ ] Railway/Render: Root Directory `backend/`; env `DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET` (strong, random), `CORS_ORIGIN` (the Vercel URL), `NODE_ENV=production`, `PORT`.
+- [ ] Run the seed once against Neon (`npx prisma db seed`).
+- [ ] Vercel: Vite preset, env `VITE_API_URL=https://<backend-domain>/api`.
+- [ ] Smoke test on the deployed URLs (see Verification), including a hard refresh on a deep link.
 
-Keep frontend at repo root; add `backend/` as an npm workspace member.
+Open verification items: the mobile card layout of `/admin/orders`, and the order-status PATCH failure message in a real browser (covered only by a unit test).
+
+## Decisions
+
+- **Stack**: PostgreSQL (Neon in production, local DB `phone_catalog` in development), Prisma, Express 4 + TypeScript + zod, JWT auth with `user`/`admin` roles. Frontend: React 18, Vite 5, TanStack Query v5, react-router-dom v6, SCSS modules.
+- **Monorepo, no workspaces**: `backend/` is an independent package next to the frontend (own `package.json` and lockfile). Both install and deploy separately; the backend deploy uses Root Directory `backend/`. *The original plan called for npm workspaces; they were never added.*
+- **No guest cart or favorites** (revised mid-phase 3). Cart and favorites exist only for authenticated users. Logged-out users who add to cart or favorites are redirected to `/login` (hook `useRequireAuth`, which passes `state.from`). There are no `/merge` endpoints, and no `localStorage` copy of cart or favorites.
+- **One denormalized `Product` row per SKU** (194 rows), because the source data already treats each colour/capacity combination as an independent record.
+- **Images** stay static in `public/img/**`; the DB stores their paths.
+- **Order prices are snapshots** (`OrderItem.priceAtPurchase`), so later price edits do not rewrite history.
+
+## Layout
 
 ```
 phone-catalog-AI/
-├── package.json            # add "workspaces": ["backend"], keep existing frontend deps/scripts
-├── vercel.json              # NEW — SPA rewrite for BrowserRouter
-├── .env.example             # NEW — VITE_API_URL
-├── .gitignore                # UPDATED — add .env, .env.local
-├── src/, public/             # existing frontend, mostly unchanged
-└── backend/                  # NEW workspace
-    ├── package.json          # express, prisma, zod, jsonwebtoken, bcryptjs, cors
-    ├── tsconfig.json
-    ├── .env.example           # DATABASE_URL, DIRECT_URL, JWT_SECRET, CORS_ORIGIN, PORT
-    ├── prisma/
-    │   ├── schema.prisma
-    │   ├── seed.ts            # reads ../public/api/*.json
-    │   └── migrations/
+├── package.json, vite.config.ts, vercel.json, .env.example (VITE_API_URL)
+├── docs/PLAN.md
+├── public/                      # fonts, img/**, favicon (no api/*.json any more)
+├── src/                         # frontend
+│   ├── index.tsx                # QueryClientProvider > AuthProvider > CartProvider > FavoritesProvider > BrowserRouter
+│   ├── AppRoutes.tsx
+│   ├── api/                     # http.ts (fetch wrapper, ApiError, Bearer token) + auth, products, cart, favorites, orders, reviews, admin
+│   ├── contexts/                # AuthContext, CartContext, FavoritesContext
+│   ├── hooks/                   # queries/* (TanStack Query hooks), useRequireAuth, useProducts, useCatalogCategory
+│   ├── lib/queryClient.ts
+│   ├── modules/                 # pages + their components (see Routes), shared/ (ProductCard, Modal, Pagination, ProtectedRoute, ...)
+│   ├── components/              # Header, Footer, Navbar, BurgerMenu, Logo, Loader
+│   ├── styles/                  # _tokens, _breakpoints, _mixins, _variables, global.scss
+│   ├── types/, utils/, constants/, test/setup.ts
+│   └── (imports use the `@/` alias for `src`)
+└── backend/
+    ├── package.json, tsconfig.json, vitest.config.ts, .eslintrc.cjs, .prettierrc, .env.example
+    ├── prisma/                  # schema.prisma, seed.ts, seed-data/*.json, migrations/
     └── src/
-        ├── index.ts, app.ts
-        ├── config/env.ts       # zod-validated process.env
-        ├── lib/prisma.ts       # PrismaClient singleton
-        ├── middleware/         # auth.ts, requireRole.ts, validate.ts, errorHandler.ts
-        ├── utils/               # jwt.ts, password.ts, ApiError.ts
-        └── modules/
-            ├── auth/ products/ cart/ favorites/ orders/ reviews/
-            └── each: {feature}.routes.ts / .controller.ts / .service.ts / .schema.ts
+        ├── index.ts, app.ts, config/env.ts (zod-validated env), lib/prisma.ts
+        ├── middleware/          # auth, requireRole (admin), validate(schema, 'body'|'query'|'params'), errorHandler
+        ├── utils/               # ApiError, asyncHandler, jwt, password, schemas
+        ├── test/prismaMock.ts
+        └── modules/             # auth, products, cart, favorites, orders, reviews: *.routes / *.controller / *.service / *.schema
 ```
 
-## 2. PostgreSQL schema (Prisma)
+## Data model
 
-Model `Product` as one denormalized row per SKU, matching today's `itemId` granularity (194 rows in `products.json`) — this mirrors the source data (each color/capacity combo is already a fully independent record) and avoids inventing a variant-relationship the source data doesn't cleanly support. DB columns use `priceRegular`/`priceDiscount`; the products **list** API maps these to `fullPrice`/`price` so `Product.ts` needs no renames, and the **detail** API maps 1:1 onto `ProductFull.ts` plus one additive field (`productId: number`, the numeric SKU id `ProductDetails.tsx` needs for cart/favorites, alongside the existing string slug `id`).
+Defined in `backend/prisma/schema.prisma` (one migration, `base_migration`). Models: `Product`, `User`, `Cart`, `CartItem`, `Favorite`, `Order`, `OrderItem`, `Review`. Enums: `ProductCategory` (`phones|tablets|accessories`), `Role` (`user|admin`), `OrderStatus` (`pending|paid|shipped|delivered|cancelled`).
 
-```prisma
-enum ProductCategory { phones tablets accessories }
-enum Role { user admin }
-enum OrderStatus { pending paid shipped delivered cancelled }
+Points worth knowing:
+- `Product.priceRegular`/`priceDiscount` are mapped to `fullPrice`/`price` in the list API; the detail API adds `productId` (numeric id) next to the string slug `id` (`itemId`).
+- `Product.stock` (default 20) is not in the source data.
+- Unique constraints: one cart per user, one `CartItem`/`Favorite` per user and product, one `Review` per user and product (reviews are upserted).
+- `datasource` uses `DATABASE_URL` (pooled) and `directUrl = DIRECT_URL`, which Neon needs for `migrate deploy`.
 
-model Product {
-  id                Int             @id @default(autoincrement()) // preserves legacy numeric id
-  itemId            String          @unique                        // slug
-  namespaceId       String
-  category          ProductCategory
-  name              String
-  capacity          String
-  capacityAvailable String[]
-  color             String
-  colorsAvailable   String[]
-  priceRegular      Int
-  priceDiscount     Int
-  screen            String
-  resolution        String?
-  processor         String?
-  ram               String
-  camera            String?
-  zoom              String?
-  cell              String[]
-  year              Int
-  image             String
-  images            String[]
-  description       Json            // { title, text[] }[]
-  stock             Int             @default(20)   // NEW, not in source data
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  cartItems  CartItem[]
-  orderItems OrderItem[]
-  favorites  Favorite[]
-  reviews    Review[]
-  @@index([category])
-}
+## Seed (`backend/prisma/seed.ts`)
 
-model User {
-  id Int @id @default(autoincrement())
-  email String @unique
-  passwordHash String
-  name String
-  role Role @default(user)
-  createdAt DateTime @default(now())
-  cart Cart?
-  favorites Favorite[]
-  orders Order[]
-  reviews Review[]
-}
+- Reads `backend/prisma/seed-data/products.json` plus `{phones,tablets,accessories}.json`, merges each list row with its detail row by `itemId`, and warns about unmatched ones.
+- Inserts with explicit numeric ids from `products.json`, then resets the identity sequence so admin-created products get ids after the seeded range.
+- Run with `cd backend && npm run db:seed` (`prisma db seed`, wired through the `prisma.seed` field in `package.json`).
 
-model Cart {
-  id Int @id @default(autoincrement())
-  userId Int @unique
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items CartItem[]
-  updatedAt DateTime @updatedAt
-}
+## REST API
 
-model CartItem {
-  id Int @id @default(autoincrement())
-  cartId Int
-  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  productId Int
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  quantity Int @default(1)
-  @@unique([cartId, productId])
-}
-
-model Favorite {
-  id Int @id @default(autoincrement())
-  userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  productId Int
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  @@unique([userId, productId])
-}
-
-model Order {
-  id Int @id @default(autoincrement())
-  userId Int
-  user User @relation(fields: [userId], references: [id])
-  status OrderStatus @default(pending)
-  total Int
-  items OrderItem[]
-  createdAt DateTime @default(now())
-}
-
-model OrderItem {
-  id Int @id @default(autoincrement())
-  orderId Int
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId Int
-  product Product @relation(fields: [productId], references: [id])
-  quantity Int
-  priceAtPurchase Int   // snapshot so later price edits don't rewrite history
-}
-
-model Review {
-  id Int @id @default(autoincrement())
-  productId Int
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  rating Int          // 1-5, validated via zod
-  comment String?
-  createdAt DateTime @default(now())
-  @@unique([productId, userId])  // one review per user per product
-}
-```
-
-`datasource db` uses `url = env("DATABASE_URL")` (Neon pooled) and `directUrl = env("DIRECT_URL")` (Neon direct, required for `migrate deploy` against Neon's pooler).
-
-## 3. Seed strategy (`backend/prisma/seed.ts`)
-
-1. Read `public/api/products.json` (194 list rows) + `public/api/{phones,tablets,accessories}.json` (detail rows, keyed by `id` == slug).
-2. Merge each list row with its matching detail row by `itemId`; log a warning for any unmatched itemId.
-3. Insert with **explicit numeric `id`** taken from `products.json` so any dev-created localStorage cart/favorite entries keep resolving to the same rows.
-4. After seeding, reset the Postgres identity sequence (`setval(pg_get_serial_sequence(...))`) so admin-created products get ids beyond the seeded range.
-5. Wire via `"prisma": {"seed": "tsx prisma/seed.ts"}` in `backend/package.json`, run with `npx prisma db seed`.
-6. Images stay as static files served by the frontend (`public/img/**`) — no image migration needed, paths copied as-is into `image`/`images` columns.
-7. Once Phase 1 (below) is verified end-to-end, delete `public/api/*.json` (dead weight after `src/api/products.ts` stops using them).
-
-## 4. Express REST API
-
-Structure: `backend/src/modules/<feature>/{routes,controller,service,schema}.ts`. Single `PrismaClient` in `backend/src/lib/prisma.ts`. Zod schemas + a `validate(schema)` middleware. `auth.ts` (verifies JWT, sets `req.user`), `requireRole('admin')` guard. Central `errorHandler.ts` mapping `ApiError` + Prisma error codes (`P2002`→409, `P2025`→404) to JSON. CORS allow-list from `CORS_ORIGIN` env var.
+Every route lives under `/api`. `auth` verifies the JWT, `requireAdmin` guards admin routes, input is validated with zod, and `errorHandler` maps `ApiError` and Prisma errors (`P2002`→409, `P2003`/`P2025`→404). CORS is an allow-list from `CORS_ORIGIN`.
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
@@ -188,59 +98,52 @@ Structure: `backend/src/modules/<feature>/{routes,controller,service,schema}.ts`
 | POST | `/api/auth/register` | none | `{email,password,name}` → `{user, token}` |
 | POST | `/api/auth/login` | none | `{email,password}` → `{user, token}` |
 | GET | `/api/auth/me` | required | |
-| GET | `/api/products` | none | query `category,sort,page,perPage,search` → `{items, total}` — matches `CatalogPage.tsx` contract |
+| GET | `/api/products` | none | query `category,sort,page,perPage,search` → `{items,total}`. Invalid `sort`/`page`/`perPage` fall back to defaults (`.catch`), they do not return 400 |
 | GET | `/api/products/:category/:itemId` | none | unified detail shape |
-| POST/PUT/DELETE | `/api/products[/:id]` | admin | product CRUD |
-| GET/POST/PATCH/DELETE | `/api/cart[/:productId]` | required | cart CRUD — *implemented as-is, no `/merge` route (no guest cart to merge)* |
-| GET/POST/DELETE | `/api/favorites[/:productId]` | required | favorites CRUD — *same: no `/merge` route* |
-| POST/GET | `/api/orders` | required | create order (snapshots prices, clears server cart) / list own orders |
+| POST | `/api/products` | admin | create |
+| PUT / DELETE | `/api/products/:id` | admin | update / delete |
+| GET / POST / DELETE | `/api/cart` | required | get / add / clear |
+| PATCH / DELETE | `/api/cart/:productId` | required | change quantity / remove item |
+| GET / POST | `/api/favorites` | required | |
+| DELETE | `/api/favorites/:productId` | required | |
+| POST / GET | `/api/orders` | required | create (snapshots prices, clears the cart) / list own orders |
 | GET | `/api/orders/:id` | owner or admin | |
-| GET | `/api/admin/orders` | admin | filter by status |
+| GET | `/api/admin/orders` | admin | optional `?status=` filter; includes `user {id,email,name}` |
 | PATCH | `/api/admin/orders/:id/status` | admin | |
-| GET/POST | `/api/products/:productId/reviews` | none / required | list + avg rating / upsert own review |
+| GET | `/api/reviews?productId=` | none | list and average rating |
+| POST | `/api/reviews` | required | upsert own review |
 | DELETE | `/api/reviews/:id` | owner or admin | |
 
-No guest-cart backend endpoints exist by design. Unlike the original plan, there's no guest-side `localCart.ts`/`localFavorites.ts` touchpoint either — anonymous users simply can't add to cart/favorites; the UI redirects them to `/login` instead.
+## Frontend
 
-## 5. Frontend integration
+Routes (`src/AppRoutes.tsx`):
 
-- Add `@tanstack/react-query` (+ devtools). New `src/lib/queryClient.ts`.
-- Provider order in `src/index.tsx`: `QueryClientProvider > AuthProvider (new) > CartProvider > FavoritesProvider > BrowserRouter (was HashRouter)`.
-- New `src/api/http.ts`: fetch wrapper reading `VITE_API_URL`, attaching `Authorization: Bearer <token>`, throwing typed `ApiError`.
-- Rewrite `src/api/products.ts` to call the backend (`getProducts(params)` → `{items,total}`, `getProductDetails(category,itemId)`); new query hooks under `src/hooks/queries/` replace the manual fetch/useState in `useProducts.ts`, `CatalogPage.tsx`, and the `Promise.all` dance in `ProductDetails.tsx` (collapses to one query now the backend returns a unified row).
-- `CatalogPage.tsx`: sort/perPage/page become query params sent to the API; `Pagination`'s `total` comes from the API response instead of `sortedProducts.length`. URL-param contract unchanged.
-- `ProductFull.ts`: add `productId: number` field (additive only); `ProductDetails.tsx` uses it instead of the separately-fetched `baseProduct.id`.
-- New `src/contexts/AuthContext.tsx`: JWT in localStorage (`authToken`), `login/register/logout/user/isAuthenticated/isAdmin`, hydrates via `GET /api/auth/me` on mount.
-- New pages/routes: `/login`, `/register`, `/profile` (order history), `/admin` + `/admin/products/new` + `/admin/products/:id/edit` (wrapped in new `ProtectedRoute` checking `isAuthenticated && isAdmin`), reviews UI inside `ProductDetails.tsx`. Checkout reuses `CartPage.tsx`'s existing Modal-confirm flow, wired to a create-order mutation instead of just `clearCart()`.
-- `CartContext`/`FavoritesContext`: kept the exact same returned shape (zero changes needed in `ProductCard`, `Header`, `CartPage`, `FavoritesPage`, `ProductDetails.tsx`). **Revised from the original local/server-hybrid design**: internals fully replaced with server-backed state (`src/api/cart.ts`/`src/api/favorites.ts`), gated on `useAuth().isAuthenticated` — logged-out state is simply an empty array, nothing is read from or written to `localStorage`. A new `useRequireAuth` hook wraps the `toggleCart`/`toggleFavorite` call sites in `ProductCard`/`ProductDetails.tsx`: if the user isn't authenticated it redirects to `/login` (passing `state.from` so the user lands back where they started after logging in) instead of letting the action proceed. No merge-on-login step exists or is needed.
-- Env: new root `.env.example` (`VITE_API_URL=http://localhost:4000/api`); fix root `.gitignore` to add `.env`/`.env.local`; add `backend/.gitignore`.
-- Router: switch `HashRouter`→`BrowserRouter` (real hosting now, not GH Pages subpath). Update `vite.config.ts` `base` to default. Add root `vercel.json` SPA rewrite (`/(.*) → /index.html`). `gh-pages` script/dep become dead weight — flagged for removal, not blocking.
+| Path | Page | Access |
+|---|---|---|
+| `/` | HomePage | public |
+| `/:category` | CatalogPage (URL params `sort` ∈ `title|price|age`, `perPage`, `page`) | public |
+| `/:category/:productId` | ProductDetailsPage (with `ProductReviews`) | public |
+| `/cart`, `/favorites` | CartPage (checkout via Modal and a create-order mutation), FavoritesPage | public pages, actions need login |
+| `/login`, `/register` | LoginPage, RegisterPage | public |
+| `/orders` | OrdersPage (order history) | logged in (`ProtectedRoute`) |
+| `/admin` | AdminPage (products table/cards, link to orders) | admin |
+| `/admin/products/new`, `/admin/products/:id/edit` | AdminProductFormPage | admin |
+| `/admin/orders` | AdminOrdersPage (status filter, per-order status select) | admin |
+| `*` | NotFoundPage | public |
 
-## 6. Deployment
+Notes:
+- `AuthContext`: JWT in `localStorage` (`authToken`), exposes `user, isAuthenticated, isAdmin, login, register, logout`, hydrates through `GET /api/auth/me`.
+- `CartContext`/`FavoritesContext` keep a small stable shape (`cart, toggleCart, removeFromCart, increase, decrease, clearCart` / `favorites, toggleFavorite`) but are backed by the server API and TanStack Query.
+- API base URL comes from `VITE_API_URL` (`.env.example`: `http://localhost:4000/api`). `vite.config.ts` has `base: '/'`; `vercel.json` rewrites everything to `/index.html`.
 
-- **Neon**: create project, grab pooled (`DATABASE_URL`) + direct (`DIRECT_URL`) connection strings. Commit `backend/prisma/migrations/` from local `prisma migrate dev` runs.
-- **Backend (Railway/Render)**: Root Directory = **repo root** (not `backend/` — npm workspaces hoist deps to root `node_modules`). Build: `npm install && npm run build -w backend`. Start: `npm run start -w backend`, where backend's `start` script is `prisma migrate deploy && node dist/index.js` (safe/idempotent migration on every boot). Env vars: `DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET`, `CORS_ORIGIN`, `NODE_ENV=production`, `PORT`.
-- **Frontend (Vercel)**: Root Directory = repo root, Framework = Vite, Build = default, Output = `dist`. Env: `VITE_API_URL=https://<backend-domain>/api`. `vercel.json` rewrite already added in Phase 1.
-- Backend/frontend deploys are independent at build time (frontend never calls the API during build); just ensure backend is live before merging frontend changes that depend on new endpoints.
+## Tooling and tests
 
-## 7. Phased execution (app stays demoable at every step)
-
-0. **Backend scaffold** — `.gitignore` fixes, `"workspaces"` in root `package.json`, Express+TS+Prisma skeleton with just `/api/health`, full `schema.prisma` + first migration (avoids repeated migration churn). Frontend untouched.
-1. **Products read API + TanStack Query + router swap** — `seed.ts`, products GET routes; frontend gets `@tanstack/react-query`, rewritten `products.ts`/`useProducts.ts`/`CatalogPage.tsx`/`ProductDetails.tsx`, `productId` field, `BrowserRouter` + `vercel.json`. Delete `public/api/*.json` once verified. Cart/favorites still localStorage-only.
-2. **Auth** — users table + JWT routes/middleware; `AuthContext`, `/login`, `/register`, Header login state. Cart/favorites still unaffected.
-3. **Cart & favorites, auth-only** — backend `cart`/`favorites` modules (100% auth-required, no guest-cart endpoints); `CartContext`/`FavoritesContext` evolve per §5 (full server replacement, not a local/server hybrid); new `useRequireAuth` hook redirects guests to `/login` on add-to-cart/favorite. *Deviates from the original guest-cart-with-merge design — decided with the user mid-phase in favor of a simpler auth-required flow; no merge-on-login step was built.*
-4. **Orders/checkout** — order creation + snapshot pricing; `CartPage.tsx` Modal wired to create-order mutation; `ProfilePage` order history.
-5. **Reviews** — endpoints + avg rating; `Reviews` component on `ProductDetails.tsx`.
-6. **Admin panel CRUD** — admin product endpoints; `ProtectedRoute`, `AdminPage` table + create/edit forms, delete via existing `Modal`.
-7. **Cloud deployment** — Neon + Railway/Render + Vercel per §6.
+- Frontend: `npm start`, `npm run build`, `npm run typecheck`, `npm test` (vitest + jsdom + Testing Library), `npm run lint` (stylelint + prettier). ESLint (airbnb-typescript + prettier) runs on staged files in the pre-commit hook.
+- Backend: `cd backend && npm run dev | build | start | test | lint | format | typecheck | db:migrate | db:seed | db:reset`. Tests use vitest with a mocked Prisma client; `app.routes.test.ts` covers the HTTP routes with supertest, and `vitest.config.ts` sets the env vars so no `.env` is needed.
+- Local run: backend on port 4000, frontend on 5173 (two terminals; there is no root `dev:backend` script).
 
 ## Verification
 
-- After Phase 0: `curl http://localhost:4000/api/health` returns 200; `npx prisma migrate dev` succeeds against a local/Neon dev DB.
-- After Phase 1: run frontend (`npm run start`) + backend (`npm run dev:backend`) together; browse `/`, a category page (sort/perPage/pagination), a product detail page, and confirm data now comes from Postgres (kill the backend and confirm the frontend errors instead of silently falling back to JSON).
-- After Phase 2: register + login via UI, confirm JWT persists across refresh, confirm `/api/auth/me` returns the right role.
-- After Phase 3: confirm a logged-out click on "Add to cart"/the favorite heart redirects to `/login` instead of adding anything; after logging in, confirm cart/favorites actions hit the server (`GET /api/cart`/`GET /api/favorites`) and persist across logout/login.
-- After Phase 4: full guest→signup→cart→checkout→order-history flow works end-to-end; verify `OrderItem.priceAtPurchase` snapshots correctly if the product price is edited afterward.
-- After Phase 5: submit a review, confirm average rating updates, confirm duplicate review by same user is rejected/upserted.
-- After Phase 6: log in as a non-admin and confirm `/admin` redirects; log in as admin and confirm create/edit/delete product round-trips to Postgres and reflects on the catalog immediately.
-- After Phase 7: hit the deployed Vercel URL, confirm it talks to the deployed Railway/Render API and Neon DB (check network tab for `VITE_API_URL`), hard-refresh a deep link (e.g. a product detail page) to confirm the Vercel SPA rewrite works.
+- Local: run both servers, then browse `/`, a category (sort, perPage, pagination), a product page, register and log in, add to cart and favorites, check out, see the order in `/orders`, leave a review. As admin: create/edit/delete a product and change an order status in `/admin/orders`.
+- A non-admin user opening `/admin*` is redirected.
+- After phase 7: open the deployed Vercel URL, confirm in the network tab that requests go to `VITE_API_URL`, and hard-refresh a deep link (for example a product page) to check the SPA rewrite.
