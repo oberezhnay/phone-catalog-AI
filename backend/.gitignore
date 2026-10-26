@@ -1,5 +1,8 @@
 node_modules
 dist
+public
+.vercel
 .env
-.env.local
+.env.*
+!.env.example
 *.log
