@@ -19,7 +19,7 @@ Last updated: 2026-11-04. This file describes the project **as it is now** (all 
 ### Remaining work (optional)
 
 - [ ] CI (`lint`, `typecheck`, `test` for both packages). There is no `.github/` yet.
-- [ ] Cleanup: `cypress` and `eslint-plugin-cypress` are still in `package.json`, but there are no Cypress tests.
+- [ ] Cleanup: there are no Cypress tests, but `cypress` and `eslint-plugin-cypress` cannot simply be removed: `.eslintrc.cjs` extends `plugin:cypress/recommended`. Removing them means editing the ESLint config too.
 - [ ] Open verification items: the mobile card layout of `/admin/orders`, and the order-status PATCH failure message in a real browser (covered only by a unit test).
 
 ## Deployment
