@@ -12,7 +12,13 @@ import { CustomSelect } from './components/Select';
 import { parseOption } from '@/utils/parseOption';
 import { NotFoundPage } from '@/modules/NotFoundPage';
 
-const SORT_OPTIONS = ['title', 'price', 'age'] as const;
+const SORT_OPTIONS = [
+  'age',
+  'title',
+  'price',
+  'price-desc',
+  'discount',
+] as const;
 const PER_PAGE_OPTIONS = ['4', '8', '16', 'all'] as const;
 
 export type PerPageType = (typeof PER_PAGE_OPTIONS)[number];
@@ -112,8 +118,10 @@ export const CatalogPage = () => {
                 onChange={v => updateParam('sort', v)}
                 options={[
                   { value: 'age', label: 'Newest' },
-                  { value: 'title', label: 'Alphabetically' },
-                  { value: 'price', label: 'Cheapest' },
+                  { value: 'title', label: 'Name' },
+                  { value: 'price', label: 'Price, low to high' },
+                  { value: 'price-desc', label: 'Price, high to low' },
+                  { value: 'discount', label: 'Discount' },
                 ]}
               />
             </div>

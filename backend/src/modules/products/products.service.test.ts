@@ -92,6 +92,7 @@ describe('products.service', () => {
     it.each([
       ['title', { name: 'asc' }],
       ['price', { priceDiscount: 'asc' }],
+      ['price-desc', { priceDiscount: 'desc' }],
       ['age', { year: 'desc' }],
     ] as const)(
       'sorts by %s using the matching column',
@@ -106,6 +107,52 @@ describe('products.service', () => {
         );
       },
     );
+
+    describe('sort by discount', () => {
+      const priced = (
+        id: number,
+        priceRegular: number,
+        priceDiscount: number,
+      ) => ({ ...product({ id }), priceRegular, priceDiscount }) as never;
+
+      // percent off: id 1 → 10%, id 2 → 25%, id 3 → 25%, id 4 → 5%
+      const rows = [
+        priced(1, 1000, 900),
+        priced(3, 400, 300),
+        priced(2, 200, 150),
+        priced(4, 100, 95),
+      ];
+
+      it('orders by percent off, largest first, ties by id', async () => {
+        prismaMock.product.count.mockResolvedValue(4);
+        prismaMock.product.findMany.mockResolvedValue(rows);
+
+        const result = await getProductsService({
+          sort: 'discount',
+          page: 1,
+          perPage: 'all',
+        });
+
+        expect(result.items.map(item => item.id)).toEqual([2, 3, 1, 4]);
+      });
+
+      it('loads every matching row and paginates after sorting', async () => {
+        prismaMock.product.count.mockResolvedValue(4);
+        prismaMock.product.findMany.mockResolvedValue(rows);
+
+        const result = await getProductsService({
+          sort: 'discount',
+          page: 2,
+          perPage: 2,
+        });
+
+        expect(prismaMock.product.findMany).toHaveBeenCalledWith({
+          where: {},
+        });
+        expect(result.items.map(item => item.id)).toEqual([1, 4]);
+        expect(result.total).toBe(4);
+      });
+    });
 
     it('paginates with skip/take derived from page and perPage', async () => {
       prismaMock.product.count.mockResolvedValue(50);

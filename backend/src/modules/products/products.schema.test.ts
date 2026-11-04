@@ -16,6 +16,12 @@ describe('getProductsQuerySchema', () => {
     ).toEqual({ category: 'phones', sort: 'price', page: 2, perPage: 8 });
   });
 
+  it('accepts every sort option', () => {
+    for (const sort of ['age', 'title', 'price', 'price-desc', 'discount']) {
+      expect(getProductsQuerySchema.parse({ sort }).sort).toBe(sort);
+    }
+  });
+
   it('accepts any whole number of items per page from 1 to 100', () => {
     expect(getProductsQuerySchema.parse({ perPage: '5' }).perPage).toBe(5);
     expect(getProductsQuerySchema.parse({ perPage: '100' }).perPage).toBe(100);

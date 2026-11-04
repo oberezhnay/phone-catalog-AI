@@ -38,7 +38,10 @@ export const updateProductSchema = createProductSchema.partial();
 // `.catch` keeps that behaviour: an invalid value falls back to its default.
 export const getProductsQuerySchema = z.object({
   category: z.enum(categories).optional().catch(undefined),
-  sort: z.enum(['title', 'price', 'age']).optional().catch(undefined),
+  sort: z
+    .enum(['title', 'price', 'price-desc', 'age', 'discount'])
+    .optional()
+    .catch(undefined),
   page: z.coerce.number().int().positive().catch(1),
   // Any whole number from 1 to 100 (as before), or 'all'. Caps the page size.
   perPage: z
