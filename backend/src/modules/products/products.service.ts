@@ -10,13 +10,27 @@ import { ApiError } from '../../utils/ApiError.js';
 const DUPLICATE_ITEM_ID = 'Product with this itemId already exists';
 
 const ORDER_BY: Record<
-  NonNullable<GetProductsQuery['sort']>,
+  Exclude<GetProductsQuery['sort'], 'discount' | undefined>,
   Prisma.ProductOrderByWithRelationInput
 > = {
   title: { name: 'asc' },
   price: { priceDiscount: 'asc' },
+  'price-desc': { priceDiscount: 'desc' },
   age: { year: 'desc' },
 };
+
+type PricedProduct = {
+  id: number;
+  priceRegular: number;
+  priceDiscount: number;
+};
+
+const discountPercent = (product: PricedProduct) =>
+  (product.priceRegular - product.priceDiscount) / product.priceRegular;
+
+// Largest percent off first; ties by id so pages stay stable.
+const byDiscount = (a: PricedProduct, b: PricedProduct) =>
+  discountPercent(b) - discountPercent(a) || a.id - b.id;
 
 // itemId is unique; the database rejects a duplicate, so no pre-check is needed.
 function rethrowDuplicateItemId(error: unknown): never {
@@ -53,12 +67,19 @@ export async function getProductsService(query: GetProductsQuery) {
   const skip = (page - 1) * itemsPerPage;
   const take = perPage === 'all' ? undefined : itemsPerPage;
 
-  const items = await prisma.product.findMany({
-    where,
-    orderBy: sort ? ORDER_BY[sort] : undefined,
-    skip,
-    take,
-  });
+  // The database cannot order by a computed percentage, so the discount sort
+  // loads every matching row (the catalog is small) and pages in memory.
+  const items =
+    sort === 'discount'
+      ? (await prisma.product.findMany({ where }))
+          .sort(byDiscount)
+          .slice(skip, take === undefined ? undefined : skip + take)
+      : await prisma.product.findMany({
+          where,
+          orderBy: sort ? ORDER_BY[sort] : undefined,
+          skip,
+          take,
+        });
 
   // Map to list format (fullPrice/price instead of priceRegular/priceDiscount)
   const mappedItems = items.map(product => ({
