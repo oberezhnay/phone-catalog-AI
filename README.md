@@ -2,6 +2,11 @@
 
 **Phone Catalog** is a full-stack store for mobile phones, tablets and accessories. Shoppers can browse the catalog, view product details, sign in, manage a cart and favorites, place orders and leave reviews. Admins can manage products and orders from an admin panel. The project is a practice ground for scalable React and TypeScript front-end work, backed by an Express API and PostgreSQL.
 
+## 🔗 Live Demo
+
+- App: https://phone-catalog-eight-chi.vercel.app
+- API: https://phone-catalog-api.vercel.app/api (health check: [`/api/health`](https://phone-catalog-api.vercel.app/api/health))
+
 ## 🎨 Design Reference
 
 - [Figma design](https://www.figma.com/file/T5ttF21UnT6RRmCQQaZc6L/Phone-catalog-(V2)-Original)
@@ -133,6 +138,23 @@ Run these after changes to auth, reviews or the admin panel:
 - Log in as an admin user. Create, edit and delete a product. Each change should be saved to PostgreSQL and show up in the catalog straight away.
 - As an admin, open `/admin/orders`, filter by status and change an order's status. The order list should update.
 
+## Deployment
+
+The app runs on Vercel (two projects from this repo) with a Neon PostgreSQL database.
+
+| Part | Vercel project settings | Environment variables |
+| --- | --- | --- |
+| Frontend | Root Directory: repo root, Framework: Vite | `VITE_API_URL` = backend URL + `/api` (inlined at build time) |
+| Backend | Root Directory: `backend`, Framework: Other (build settings come from `backend/vercel.json`) | `DATABASE_URL` (Neon pooled, with `pgbouncer=true`), `DIRECT_URL` (Neon direct), `JWT_SECRET`, `CORS_ORIGIN` = frontend URL |
+
+- On Vercel the Express app runs as a serverless function: `backend/api/index.js` exports the compiled app and `backend/vercel.json` sends every request to it.
+- The backend build (`npm run vercel-build`) generates the Prisma client, applies migrations with `prisma migrate deploy` and compiles TypeScript, so `DIRECT_URL` must be available at build time.
+- Pushing to `main` deploys both projects; other branches get preview deployments.
+- Seed a new, empty database once from your machine, with `DATABASE_URL`/`DIRECT_URL` pointing at it: `cd backend && npm run db:seed`. **The seed deletes all existing data first**, so never run it against a database that has real users or orders.
+- To make an admin, register in the app and set that user's `role` to `admin` in the database, then log in again.
+
+For a regular Node host instead of Vercel: build with `npm ci && npm run build` in `backend/` and start with `npm start`, which applies migrations and runs `dist/index.js`.
+
 ## Design Notes
 
-[docs/PLAN.md](./docs/PLAN.md) records the build plan, the decisions made along the way (such as requiring sign-in for cart and favorites), the API and routes, and what is left to do (cloud deployment).
+[docs/PLAN.md](./docs/PLAN.md) records the build plan, the decisions made along the way (such as requiring sign-in for cart and favorites), the API and routes, the current deployment and what is left to do.
