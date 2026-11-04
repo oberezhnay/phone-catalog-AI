@@ -21,7 +21,11 @@ export const CartItem: React.FC<Props> = ({ product, qty }) => {
           <img src="/img/icons/Close.svg" alt="Delete"></img>
         </button>
         <NavLink to={`/${product.category}/${product.itemId}`}>
-          <img src={product.image} alt={product.name} />
+          <img
+            className={styles.image}
+            src={product.image}
+            alt={product.name}
+          />
         </NavLink>
         <p className="name">{product.name}</p>
       </div>

@@ -28,15 +28,18 @@
 
       img {
         border: 1px solid $elements;
+        border-radius: $radius-sm;
+        background-color: $surface;
         height: 50px;
+        transition: border-color 0.2s ease;
 
         &:hover {
-          border: 1px solid $icons;
+          border-color: $icons;
         }
       }
 
       .active {
-        border: 1px solid $primary;
+        border-color: $primary;
       }
 
 
@@ -130,7 +133,7 @@
     font-size: 12px;
     font-weight: 600;
     color: $secondary;
-    font-family: Mont, sans-serif;
+    font-family: inherit;
     margin-bottom: 8px;
   }
 
@@ -198,14 +201,20 @@
         gap: 8px;
       }
       .capacity {
-        border: 1px solid $icons;
-        padding: 7px 8px 4px;
+        border: 1px solid $elements;
+        border-radius: $radius-sm;
+        background-color: $white;
+        padding: 6px 10px;
+        transition: border-color 0.2s ease;
 
-        @include hover(box-shadow, 0 3px 13px rgba(23, 32, 49, 0.4));
+        &:hover {
+          border-color: $primary;
+        }
       }
       .active {
         color: $white;
-        background-color: $primary ;
+        background-color: $primary;
+        border-color: $primary;
       }
     }
 
@@ -220,7 +229,7 @@
       padding: 9px 0;
 
       .price {
-        font-weight: 800;
+        font-weight: 700;
       }
 
       .fullPrice {
@@ -241,32 +250,37 @@
       background-color: $primary;
       color: $white;
       border: none;
-      padding: 0 10px;
+      border-radius: $radius-sm;
+      padding: 0 12px;
       height: 40px;
       flex-grow: 1;
       cursor: pointer;
-      font-weight: 700;
+      font-weight: 600;
       font-size: 14px;
       line-height: 21px;
+      transition: background-color 0.2s ease;
 
-      @include hover(box-shadow, 0 3px 13px rgba(23, 32, 49, 0.4));
+      &:hover {
+        background-color: $accent;
+      }
     }
 
     .added {
       background-color: $white;
       color: $green;
-      border: 1px solid $elements;
+      border: 1px solid $green;
       pointer-events: none;
     }
 
     .add-to-favorite {
       background-color: $white;
-      border: 1px solid $icons;
+      border: 1px solid $elements;
+      border-radius: $radius-sm;
       width: 40px;
       height: 40px;
       cursor: pointer;
       display: flex;
-      transition: border-color 0.3s ease-in-out;
+      transition: border-color 0.2s ease-in-out;
 
       /* stylelint-disable no-descending-specificity */
       img {

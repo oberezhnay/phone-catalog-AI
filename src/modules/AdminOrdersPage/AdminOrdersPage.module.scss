@@ -30,6 +30,7 @@
   height: 40px;
   padding: 0 8px;
   border: 1px solid $elements;
+  border-radius: $radius-sm;
   background-color: $white;
   font-size: 14px;
   text-transform: capitalize;
@@ -57,7 +58,11 @@
 }
 
 .card {
-  border: 1px solid $elements;
+  @include glass(0.6);
+
+  border: 1px solid $glass-border;
+  border-radius: $radius-md;
+  box-shadow: $glass-shadow;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -96,6 +101,12 @@
   display: none;
   overflow-x: auto;
 
+  @include glass(0.6);
+
+  border: 1px solid $glass-border;
+  border-radius: $radius-md;
+  box-shadow: $glass-shadow;
+
   @include on-tablet {
     display: block;
   }
@@ -112,12 +123,16 @@
     padding: 12px;
     border-bottom: 1px solid $elements;
     font-size: 14px;
-    vertical-align: top;
+    vertical-align: middle;
   }
 
   th {
     color: $secondary;
     font-weight: 600;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
   }
 }
 

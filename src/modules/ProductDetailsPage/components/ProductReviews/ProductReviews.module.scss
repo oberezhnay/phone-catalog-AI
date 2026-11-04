@@ -33,7 +33,11 @@ $star-color: #ffc107;
 }
 
 .item {
-  border: 1px solid $elements;
+  @include glass(0.6);
+
+  border: 1px solid $glass-border;
+  border-radius: $radius-md;
+  box-shadow: $glass-shadow;
   padding: 16px;
 }
 
@@ -92,10 +96,19 @@ $star-color: #ffc107;
   width: 100%;
   min-height: 80px;
   border: 1px solid $elements;
+  border-radius: $radius-sm;
+  background-color: $white;
   padding: 8px 12px;
   font-size: 14px;
   font-family: inherit;
   resize: vertical;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: $accent;
+    box-shadow: $focus-ring;
+  }
 }
 
 .error {
@@ -114,27 +127,37 @@ $star-color: #ffc107;
   background-color: $primary;
   color: $white;
   border: none;
+  border-radius: $radius-sm;
   padding: 0 16px;
   height: 40px;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
+  transition: background-color 0.2s ease;
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 
-  @include hover(box-shadow, 0 3px 13px rgba(23, 32, 49, 0.4));
+  &:not(:disabled):hover {
+    background-color: $accent;
+  }
 }
 
 .delete {
   background: none;
   border: 1px solid $red;
+  border-radius: $radius-sm;
   color: $red;
   padding: 0 16px;
   height: 40px;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(220, 38, 38, 0.06);
+  }
 }

@@ -22,10 +22,14 @@
 
 .button {
   padding: 12px 24px;
+  border-radius: $radius-sm;
   background-color: $primary;
   color: $white;
   font-weight: 600;
   text-transform: uppercase;
+  transition: background-color 0.2s ease;
 
-  @include hover(box-shadow, 0 3px 13px rgba(23, 32, 49, 0.4));
+  &:hover {
+    background-color: $accent;
+  }
 }

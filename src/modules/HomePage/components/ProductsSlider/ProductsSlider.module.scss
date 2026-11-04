@@ -24,14 +24,14 @@
 
     .title {
       font-size: 22px;
-      font-weight: 800;
+      font-weight: 700;
       line-height: 140%;
-      letter-spacing: 0%;
+      letter-spacing: -0.01em;
 
       @include on-tablet {
         font-size: 32px;
         line-height: 41px;
-        letter-spacing: -1%;
+        letter-spacing: -0.02em;
       }
     }
 
@@ -42,9 +42,10 @@
     .navButton {
       width: 32px;
       height: 32px;
-      background-color: #fff;
+      background-color: $white;
       border: 1px solid $elements;
-      transition: border-color 0.3s ease-in-out;
+      border-radius: $radius-sm;
+      transition: border-color 0.2s ease-in-out;
       cursor: pointer;
 
       &:hover {

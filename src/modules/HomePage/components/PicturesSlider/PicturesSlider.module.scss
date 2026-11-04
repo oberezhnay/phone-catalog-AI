@@ -21,7 +21,8 @@
     width: 100%;
     display: flex;
     overflow: hidden;
-    box-sizing:border-box;
+    border-radius: $radius-md;
+    box-sizing: border-box;
 
     @include on-tablet {
       height: 189px;
@@ -45,11 +46,17 @@
     display: none;
     top: 0;
     width: 32px;
-    background-color: #fff;
+    background-color: $white;
     position: absolute;
-    border: 1px solid $icons;
+    border: 1px solid $elements;
+    border-radius: $radius-sm;
     z-index: 10;
     cursor: pointer;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: $primary;
+    }
 
     @include on-tablet {
       display: block;
@@ -80,16 +87,17 @@
   :global(.swiper-pagination-bullet) {
     width: 14px;
     height: 4px;
-    background: $elements;
-    border-radius: 0;
+    background: $icons;
+    border-radius: 999px;
     opacity: 0.7;
     margin: 0 6px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: width 0.3s, background-color 0.3s, opacity 0.3s;
   }
 
   /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
   :global(.swiper-pagination-bullet-active) {
+    width: 24px;
     background: $primary;
     opacity: 1;
   }

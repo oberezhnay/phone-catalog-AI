@@ -48,6 +48,21 @@
   }
 }
 
+// Frosted-glass surface. Falls back to an opaque white for users who ask
+// for reduced transparency, and to a plain translucent fill where
+// backdrop-filter is unsupported.
+@mixin glass($alpha: 0.6) {
+  background-color: rgba(255, 255, 255, $alpha);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: #FFF;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 @mixin hover($property, $toValue) {
   transition: #{$property};
   transition: all 0.3s;
