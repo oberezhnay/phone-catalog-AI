@@ -14,16 +14,19 @@ export const ShopByCategory: React.FC<Props> = ({
 }) => {
   const categories = [
     {
+      path: '/phones',
       src: 'img/phones-category.png',
       title: 'Mobile Phones',
       qnt: phonesQnt,
     },
     {
+      path: '/tablets',
       src: 'img/tablets-category.png',
       title: 'Tablets',
       qnt: tabletsQnt,
     },
     {
+      path: '/accessories',
       src: 'img/accessories-category.png',
       title: 'Accessories',
       qnt: accessoriesQnt,
@@ -35,8 +38,8 @@ export const ShopByCategory: React.FC<Props> = ({
       <p className={styles.title}>Shop by category</p>
 
       <div className={styles.categories}>
-        {categories.map((category, index) => (
-          <NavLink to="/phones" key={index}>
+        {categories.map(category => (
+          <NavLink to={category.path} key={category.path}>
             <div className={styles.category}>
               <img src={category.src} alt={category.title} />
               <p className={styles['category-title']}>{category.title}</p>
