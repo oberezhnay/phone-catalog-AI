@@ -6,6 +6,7 @@ import { useAdminProductsQuery } from '@/hooks/queries';
 import { useAuth } from '@/contexts/AuthContext';
 import { deleteAdminProduct } from '@/api/admin';
 import { Modal } from '@/modules/shared/components/Modal';
+import { BackBtn } from '@/modules/shared/components/BackBtn';
 import { AdminProduct } from '@/types/AdminProduct';
 import { AdminProductCard } from './components/AdminProductCard';
 import { AdminProductRow } from './components/AdminProductRow';
@@ -51,6 +52,7 @@ export const AdminPage = () => {
 
   return (
     <div className="container">
+      <BackBtn />
       <div className={styles.header}>
         <h1 className={styles.title}>Admin · Products</h1>
         <div className={styles.actions}>

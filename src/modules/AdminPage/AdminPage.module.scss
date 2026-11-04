@@ -4,14 +4,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   gap: 16px;
   flex-wrap: wrap;
 }
 
+// Same size as the page titles on /orders and /cart
 .title {
   font-size: 32px;
-  font-weight: 800;
+  line-height: 41px;
+  letter-spacing: -1%;
+
+  @include on-tablet {
+    font-size: 48px;
+    line-height: 56px;
+    font-weight: 800;
+  }
 }
 
 .actions {
@@ -23,15 +31,19 @@
   background-color: $primary;
   color: $white;
   border: none;
+  border-radius: $radius-sm;
   padding: 0 16px;
   height: 40px;
   display: flex;
   align-items: center;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 
-  @include hover(box-shadow, 0 3px 13px rgba(23, 32, 49, 0.4));
+  &:hover {
+    background-color: $accent;
+  }
 }
 
 // Below tablet: card list instead of a table, so a row's minimum content
@@ -49,6 +61,12 @@
 .table-wrapper {
   display: none;
   overflow-x: auto;
+
+  @include glass(0.6);
+
+  border: 1px solid $glass-border;
+  border-radius: $radius-md;
+  box-shadow: $glass-shadow;
 
   @include on-tablet {
     display: block;
@@ -71,5 +89,9 @@
   th {
     color: $secondary;
     font-weight: 600;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
   }
 }

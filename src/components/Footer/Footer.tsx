@@ -11,7 +11,7 @@ export const Footer = () => (
       <ul className={styles['footer-list']}>
         <li className={styles['footer-item']}>
           <a
-            href="https://github.com/oberezhnay/react_phone-catalog"
+            href="https://github.com/oberezhnay/phone-catalog-AI"
             target="_blank"
             rel="noreferrer"
           >
@@ -19,13 +19,7 @@ export const Footer = () => (
           </a>
         </li>
         <li className={styles['footer-item']}>
-          <a
-            href="https://github.com/oberezhnay/react_phone-catalog"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Contacts
-          </a>
+          <a href="mailto:berezhna.o.v@gmail.com">Contacts</a>
         </li>
         <li className={styles['footer-item']}>
           <a

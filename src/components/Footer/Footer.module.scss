@@ -57,9 +57,11 @@
     button {
       width: 32px;
       height: 32px;
-      background-color: #fff;
+      background-color: $white;
       border: 1px solid $elements;
-      transition: border-color 0.3s ease-in-out;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      transition: border-color 0.2s ease-in-out;
 
       &:hover {
         border-color: $primary;
