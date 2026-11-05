@@ -5,7 +5,6 @@
 ## 🔗 Live Demo
 
 - App: https://phone-catalog-eight-chi.vercel.app
-- API: https://phone-catalog-api.vercel.app/api (health check: [`/api/health`](https://phone-catalog-api.vercel.app/api/health))
 
 ## 🎨 Design Reference
 
